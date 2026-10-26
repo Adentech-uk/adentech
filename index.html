@@ -33,9 +33,9 @@ body{background:#eaf0f7;padding:24px 12px}
 #adentech-site .at-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 #adentech-site .at-form{display:flex;flex-direction:column;gap:8px;margin-top:18px}
 #adentech-site .at-label{font-size:14px;font-weight:700;color:#26384f;margin-top:8px}
-#adentech-site .at-form input,#adentech-site .at-form textarea{width:100%;padding:13px 14px;border:1px solid #cbd8e7;border-radius:8px;font:inherit;font-size:16px;line-height:1.5;color:#172033;background:#fff}
+#adentech-site .at-form input,#adentech-site .at-form textarea,#adentech-site .at-form select{width:100%;padding:13px 14px;border:1px solid #cbd8e7;border-radius:8px;font:inherit;font-size:16px;line-height:1.5;color:#172033;background:#fff}
 #adentech-site .at-form textarea{resize:vertical;min-height:120px}
-#adentech-site .at-form input:focus,#adentech-site .at-form textarea:focus{outline:2px solid #1683ff;outline-offset:1px}
+#adentech-site .at-form input:focus,#adentech-site .at-form textarea:focus,#adentech-site .at-form select:focus{outline:2px solid #1683ff;outline-offset:1px}
 #adentech-site .at-form-status{font-size:14px;line-height:1.5;color:#536174;margin:8px 0 0;min-height:1.5em}
 #adentech-site .at-form button:disabled{opacity:.65;cursor:wait}
 #adentech-site .at-card p{margin-top:8px}
@@ -140,9 +140,16 @@ body{background:#eaf0f7;padding:24px 12px}
         <form class="at-form" data-kind="quote">
           <label for="q-name" class="at-label">Your name</label><input id="q-name" name="name" autocomplete="name" required>
           <label for="q-email" class="at-label">Email address</label><input id="q-email" name="email" type="email" autocomplete="email" required>
-          <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" required>
-          <label for="q-equipment" class="at-label">Equipment and quantity</label><input id="q-equipment" name="equipment" placeholder="e.g. 2 monitors, laptop, printer" required>
-          <label for="q-details" class="at-label">What would you like done?</label><textarea id="q-details" name="details" rows="4" required></textarea>
+          <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" placeholder="e.g. NW2 3RU" required>
+          <label for="q-address" class="at-label">Full service address</label><textarea id="q-address" name="fullAddress" rows="2" placeholder="Street, town/city and postcode" required></textarea>
+          <label for="q-jobtype" class="at-label">Type of work</label><select id="q-jobtype" name="jobType" required><option value="">Choose a job type</option><option>Installation / setup</option><option>Relocation / moving equipment</option><option>Connection / configuration</option><option>Troubleshooting</option><option>Testing / handover</option><option>Other / not sure</option></select>
+          <label for="q-equipment" class="at-label">Equipment and type</label><input id="q-equipment" name="equipment" placeholder="e.g. printer, laptop, monitors" required>
+          <label for="q-quantity" class="at-label">Number of devices</label><input id="q-quantity" name="deviceQuantity" type="number" min="1" max="100" step="1" placeholder="e.g. 2" required>
+          <label for="q-model" class="at-label">Make and model (if known)</label><input id="q-model" name="makeModel" placeholder="e.g. HP LaserJet model">
+          <label for="q-status" class="at-label">Current setup / device condition</label><textarea id="q-status" name="currentStatus" rows="2" placeholder="New in box, already connected, error message (no passwords), etc."></textarea>
+          <label for="q-details" class="at-label">What would you like done?</label><textarea id="q-details" name="details" rows="4" placeholder="Describe the result you need, any error messages, and what has already been tried." required></textarea>
+          <label for="q-access" class="at-label">Access, stairs and parking</label><textarea id="q-access" name="accessParking" rows="2" placeholder="Parking availability/cost, floor, lift, access restrictions"></textarea>
+          <label for="q-photos" class="at-label">Photo link (optional)</label><input id="q-photos" name="photoLink" type="url" placeholder="Optional link to photos you choose to share">
           <label for="q-timing" class="at-label">Preferred date or weekend (optional)</label><input id="q-timing" name="timing" placeholder="Your preferred timing">
           <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Request a Quote</button>
           <p class="at-form-status" role="status" aria-live="polite"></p>
