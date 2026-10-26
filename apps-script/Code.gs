@@ -137,8 +137,13 @@ function output_(value) {
   return ContentService.createTextOutput(JSON.stringify(value))
     .setMimeType(ContentService.MimeType.JSON);
 }
-/** Simple browser check for the deployed web app. */
+
+/**
+ * Browser health check. Open the deployed /exec URL to verify the deployment.
+ * Website submissions are handled separately by doPost(e).
+ */
 function doGet() {
-  return ContentService.createTextOutput("AdenTech Quote and Enquiry endpoint is running. Submit enquiries through the website form.")
+  const message = "AdenTech Quote and Enquiry endpoint is running. Submit enquiries through the website form.";
+  return ContentService.createTextOutput(message)
     .setMimeType(ContentService.MimeType.TEXT);
 }
