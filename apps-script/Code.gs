@@ -137,3 +137,8 @@ function output_(value) {
   return ContentService.createTextOutput(JSON.stringify(value))
     .setMimeType(ContentService.MimeType.JSON);
 }
+/** Simple browser check for the deployed web app. */
+function doGet() {
+  return ContentService.createTextOutput("AdenTech Quote and Enquiry endpoint is running. Submit enquiries through the website form.")
+    .setMimeType(ContentService.MimeType.TEXT);
+}
