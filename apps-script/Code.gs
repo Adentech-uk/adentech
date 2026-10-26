@@ -22,92 +22,118 @@ const QUOTE_LABEL = "AdenTech/Quotes";
 const ENQUIRY_LABEL = "AdenTech/Enquiries";
 const BUSINESS_NAME = "AdenTech";
 const SERVICE_SUMMARY = "AdenTech helps with computer and laptop setup, monitors, printers, workstation setup and testing.";
-// Fill this in with the exact towns/postcodes you serve before adding area-based auto replies.
 const SERVICE_AREA = "LOCAL_AREA_NOT_CONFIGURED";
+
+// Owner-approved pricing rules.
+const BASE_POSTCODE = "NW8";
+const HOURLY_LABOUR_RATE = 20;
+const MINIMUM_VISIT_CHARGE = 50;
+const MINIMUM_BILLABLE_HOURS = 1;
+const MILEAGE_RATE = 0.45; // GBP per mile, round trip
+const VAT_REGISTERED = false;
 
 function doPost(e) {
   try {
     const data = JSON.parse((e && e.postData && e.postData.contents) || "{}");
-    // Optional honeypot. If added to the site as a hidden "website" field, spam is ignored.
     if (clean_(data.website, 200)) return output_({ ok: true });
-
     const kind = data.kind === "quote" ? "quote" : "enquiry";
     const name = clean_(data.name, 160);
     const email = clean_(data.email, 254);
     const message = clean_(data.details, 5000);
-
     if (!name || !email || !message || !/^\S+@\S+\.\S+$/.test(email)) {
       return output_({ ok: false, message: "Please provide a name, valid email and message." });
     }
-
     const owner = Session.getEffectiveUser().getEmail();
     if (!owner) throw new Error("No owner email is available. Deploy while signed in to the receiving Google account.");
-
     const isQuote = kind === "quote";
     const label = getLabel_(isQuote ? QUOTE_LABEL : ENQUIRY_LABEL);
     const ticket = Utilities.getUuid().slice(0, 8).toUpperCase();
     const subject = (isQuote ? "[AdenTech Quote " : "[AdenTech Enquiry ") + ticket + "] " + name;
     const location = clean_(data.location, 200);
+    const fullAddress = clean_(data.fullAddress, 500);
     const equipment = clean_(data.equipment, 500);
+    const deviceQuantity = clean_(data.deviceQuantity, 20);
+    const makeModel = clean_(data.makeModel, 300);
+    const jobType = clean_(data.jobType, 120);
+    const currentStatus = clean_(data.currentStatus, 1000);
+    const accessParking = clean_(data.accessParking, 1000);
+    const photoLink = safeUrl_(data.photoLink);
     const timing = clean_(data.timing, 200);
     const enquirySubject = clean_(data.subject, 250);
+    const mapsUrl = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(BASE_POSTCODE) + "&destination=" + encodeURIComponent(fullAddress || location);
     const body = [
       "Reference: " + ticket,
       "Type: " + (isQuote ? "Quote request — owner approval required" : "General enquiry"),
       "Name: " + name,
       "Email: " + email,
-      "Location: " + location,
+      "Town / postcode: " + location,
+      "Full service address: " + (fullAddress || "Not supplied"),
       "Equipment: " + equipment,
+      "Device quantity: " + (deviceQuantity || "Not specified"),
+      "Make / model: " + (makeModel || "Not supplied"),
+      "Job type: " + (jobType || "Not specified"),
+      "Current setup / status: " + (currentStatus || "Not supplied"),
+      "Access / parking: " + (accessParking || "Not supplied"),
+      "Photo link: " + (photoLink || "Not supplied"),
       "Preferred timing: " + timing,
       "Subject: " + enquirySubject,
       "",
       "Message:",
       message,
       "",
-      "Submitted from: " + clean_(data.page, 500)
+      "Submitted from: " + clean_(data.page, 500),
+      isQuote ? "Travel route (check route and round-trip miles before quoting): " + mapsUrl : ""
     ].join("\n");
-
-    // Send owner notification and place it under the relevant Gmail label/folder.
     const notification = GmailApp.createDraft(owner, subject, body, {
-      replyTo: email,
-      name: BUSINESS_NAME + " Website"
+      replyTo: email, name: BUSINESS_NAME + " Website"
     }).send();
     label.addToThread(notification.getThread());
 
     if (isQuote) {
-      // Prepare a customer reply as a DRAFT. Never send a price without owner review.
+      const estimate = calculateLabourEstimate_(data.estimatedHours);
       const quoteDraftBody = [
         "Hi " + name + ",",
         "",
         "Thanks for asking AdenTech for a quote (reference " + ticket + ").",
         "",
-        "Before we confirm a price, we’ll review the requested work and may ask a few follow-up questions. The final scope, any parts or travel costs, and the price will be confirmed with you before any work begins.",
+        "INDICATIVE ESTIMATE — FOR OWNER REVIEW; NOT A CONFIRMED QUOTE",
+        "Labour: " + estimate.labourText,
+        "Travel: To be confirmed after checking the route from " + BASE_POSTCODE + " and round-trip mileage (£" + MILEAGE_RATE.toFixed(2) + " per mile).",
+        "Parts / materials: Not included; confirm requirements and cost before proceeding.",
+        "VAT: Not charged (AdenTech is not VAT registered).",
+        "Indicative labour amount: " + estimate.totalText,
+        "Final price: To be confirmed after the job scope and travel are checked. No booking or work is confirmed by this estimate.",
         "",
         "Your request:",
-        "Location: " + location,
-        "Equipment: " + equipment,
+        "Town / postcode: " + (location || "Not supplied"),
+        "Service address: " + (fullAddress || "To be confirmed"),
+        "Job type: " + (jobType || "Not specified"),
+        "Equipment: " + (equipment || "Not specified"),
+        "Quantity: " + (deviceQuantity || "Not specified"),
+        "Make / model: " + (makeModel || "Not supplied"),
+        "Current setup / status: " + (currentStatus || "Not supplied"),
+        "Access / parking: " + (accessParking || "Not supplied"),
         "Requested work: " + message,
         "Preferred timing: " + (timing || "Not specified"),
+        "",
+        "We will confirm any travel costs, parts and additional work with you before work begins.",
         "",
         "Kind regards,",
         "AdenTech"
       ].join("\n");
-      GmailApp.createDraft(email, "AdenTech quote request — " + ticket, quoteDraftBody, { name: BUSINESS_NAME });
+      GmailApp.createDraft(email, "DRAFT — AdenTech quote for approval — " + ticket, quoteDraftBody, { name: BUSINESS_NAME });
       GmailApp.sendEmail(email, "We’ve received your AdenTech quote request — " + ticket,
-        "Thanks for requesting a quote from AdenTech. We’ve received your details and will review them. We’ll contact you if we need more information. No price or booking is confirmed yet.\n\nAdenTech",
+        "Thanks for requesting a quote from AdenTech. We’ve received your details and will review the scope and travel before confirming a price. This acknowledgement is not a quote or booking.\n\nReference: " + ticket + "\n\nAdenTech",
         { name: BUSINESS_NAME });
       return output_({ ok: true, reference: ticket, workflow: "quote-awaiting-owner-approval" });
     }
 
-    // Safe, fixed response only for a clear question about the services offered.
     if (isSimpleServicesQuestion_(message, enquirySubject)) {
       const answer = "Hi " + name + ",\n\nThanks for contacting AdenTech. " + SERVICE_SUMMARY +
         "\n\nWe don’t publish fixed prices because the cost depends on the job. Please use the Get a Quote form with your town or postcode and details of the setup, and we’ll review it. Service coverage and availability are confirmed individually; no booking is confirmed by this email.\n\nKind regards,\nAdenTech";
       GmailApp.sendEmail(email, "AdenTech — services information — " + ticket, answer, { name: BUSINESS_NAME });
       return output_({ ok: true, reference: ticket, workflow: "simple-enquiry-auto-answered" });
     }
-
-    // Uncertain or specific questions: acknowledge receipt, then let the owner answer.
     GmailApp.sendEmail(email, "AdenTech received your enquiry — " + ticket,
       "Thanks for contacting AdenTech. We’ve received your enquiry and will review it before replying. We don’t want to guess about pricing, service coverage, availability or technical compatibility, so a member of the team will follow up.\n\nReference: " + ticket + "\n\nAdenTech",
       { name: BUSINESS_NAME });
@@ -116,6 +142,27 @@ function doPost(e) {
     console.error(err && err.stack ? err.stack : err);
     return output_({ ok: false, message: "Unable to process request right now." });
   }
+}
+
+function calculateLabourEstimate_(requestedHours) {
+  const hours = Number(requestedHours);
+  if (!isFinite(hours) || hours <= 0) {
+    return {
+      labourText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum visit/labour charge (assumes up to 1 hour; confirm duration)",
+      totalText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum labour amount, before travel and parts"
+    };
+  }
+  const billableHours = Math.max(MINIMUM_BILLABLE_HOURS, hours);
+  const labour = Math.max(MINIMUM_VISIT_CHARGE, billableHours * HOURLY_LABOUR_RATE);
+  return {
+    labourText: billableHours + " hour(s) at £" + HOURLY_LABOUR_RATE.toFixed(2) + "/hour, minimum charge applied where relevant: £" + labour.toFixed(2),
+    totalText: "£" + labour.toFixed(2) + " labour only, before travel and parts"
+  };
+}
+
+function safeUrl_(value) {
+  const url = clean_(value, 1000);
+  return /^https:\/\//i.test(url) ? url : "";
 }
 
 function isSimpleServicesQuestion_(message, subject) {
