@@ -60,7 +60,7 @@ function doPost(e) {
           fullAddress.length < 10 ||
           !/(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})/i.test(fullAddress) ||
           !/\d/.test(fullAddress) && !/\b(flat|apartment|unit|floor|house|building)\b/i.test(fullAddress) ||
-          !isFinite(deviceQuantity) || Math.floor(deviceQuantity) !== deviceQuantity || deviceQuantity < 1 || deviceQuantity > 100 ||
+          !isFinite(deviceQuantity) || Math.floor(deviceQuantity) !== deviceQuantity || (deviceQuantity !== 0 && deviceQuantity < 1) || deviceQuantity > 100 ||
           !jobType) {
         return output_({ ok: false, message: "Quote request needs a real name, valid UK postcode and full address, job type, equipment, device count and a useful job description. Placeholder/test submissions are not accepted." });
       }
