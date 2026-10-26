@@ -52,7 +52,7 @@ function doPost(e) {
       const equipment = clean_(data.equipment, 500);
       const deviceQuantity = Number(data.deviceQuantity);
       const jobType = clean_(data.jobType, 120);
-      const badValue = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123|1234|example)$/i;
+      const badValue = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
       const ukPostcode = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
       if (badValue.test(name) || badValue.test(message) || message.length < 20 ||
           badValue.test(equipment) || equipment.length < 3 ||
@@ -106,7 +106,7 @@ function doPost(e) {
       message,
       "",
       "Submitted from: " + clean_(data.page, 500),
-      isQuote ? "Google Maps address check (owner must confirm the exact pin/address): " + addressSearchUrl + "\\nTravel route (check route and round-trip miles before quoting): " + mapsUrl : ""
+      isQuote ? "Google Maps address check (owner must confirm the exact pin/address): " + addressSearchUrl + "\nTravel route (check route and round-trip miles before quoting): " + mapsUrl : ""
     ].join("\n");
     const notification = GmailApp.createDraft(owner, subject, body, {
       replyTo: email, name: BUSINESS_NAME + " Website"
