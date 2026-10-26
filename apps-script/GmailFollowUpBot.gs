@@ -124,7 +124,7 @@ function draftQuoteAfterCustomerReply_() {
   const replySeen = getOrCreateLabel_(AT_LABELS.replySeen);
   const quoteDrafted = getOrCreateLabel_(AT_LABELS.quoteDrafted);
   const ownerEmail = String(Session.getEffectiveUser().getEmail() || "").toLowerCase();
-  const threads = GmailApp.search('in:inbox newer_than:180d -label:' + AT_LABELS.quoteDrafted, 0, 100);
+  const threads = GmailApp.search('in:inbox newer_than:180d subject:AdenTech -label:' + AT_LABELS.quoteDrafted, 0, 100);
 
   threads.forEach(function (thread) {
     const messages = thread.getMessages();
@@ -133,7 +133,8 @@ function draftQuoteAfterCustomerReply_() {
     const request = extractRequestDetails_(thread);
     const firstBody = messages.length ? messages[0].getPlainBody() : "";
     const reference = request.reference || findReference_(thread.getFirstMessageSubject() + "\n" + firstBody);
-    if (!reference) return;
+    // Scope processing to AdenTech-related subjects and references; do not treat arbitrary order IDs as quote requests.
+    if (!reference || !/adentech/i.test(thread.getFirstMessageSubject())) return;
 
     const incomingReplies = messages.filter(function (message) {
       const from = extractEmail_(message.getFrom()).toLowerCase();
