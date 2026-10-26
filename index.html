@@ -160,6 +160,42 @@ body{background:#eaf0f7;padding:24px 12px}
   <div style="margin-top:10px;">Independent home and small-office IT setup · One-off projects · Weekend availability</div>
   <div style="margin-top:14px;color:#7f93ac;">© 2026 AdenTech</div>
 </footer>
+<script>
+(function(){
+  // Deploy apps-script/Code.gs as a Google Apps Script Web App, then paste its /exec URL here.
+  const FORM_ENDPOINT = "PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+  document.querySelectorAll("#adentech-site .at-form").forEach(function(form){
+    form.addEventListener("submit", async function(event){
+      event.preventDefault();
+      const status = form.querySelector(".at-form-status");
+      const button = form.querySelector('button[type="submit"]');
+      if (!FORM_ENDPOINT || FORM_ENDPOINT.indexOf("PASTE_") === 0) {
+        status.textContent = "Our online form is being connected. Please contact us through our Fiverr service page for now.";
+        return;
+      }
+      const payload = Object.fromEntries(new FormData(form).entries());
+      payload.kind = form.dataset.kind;
+      payload.page = window.location.href;
+      button.disabled = true;
+      status.textContent = "Sending your request…";
+      try {
+        await fetch(FORM_ENDPOINT, {
+          method: "POST",
+          mode: "cors",
+          headers: {"Content-Type":"text/plain;charset=utf-8"},
+          body: JSON.stringify(payload)
+        });
+        form.reset();
+        status.textContent = "Thanks — your request has been submitted. We’ll reply by email.";
+      } catch (error) {
+        status.textContent = "We couldn’t confirm delivery. Please contact us through our Fiverr service page.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+})();
+</script>
 </div>
 </body>
 </html>
