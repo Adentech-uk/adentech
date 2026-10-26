@@ -53,19 +53,19 @@ function doPost(e) {
       const deviceQuantity = Number(data.deviceQuantity);
       const jobType = clean_(data.jobType, 120);
       const badValue = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123+|example)$/i;
-      const ukPostcode = /^(GIR\\s?0AA|(?:[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2}))$/i;
+      const ukPostcode = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
       if (badValue.test(name) || badValue.test(message) || message.length < 20 ||
           badValue.test(equipment) || equipment.length < 3 ||
           !ukPostcode.test(location) ||
           fullAddress.length < 10 ||
-          !/(?:GIR\\s?0AA|[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2})/i.test(fullAddress) ||
-          !/\\d/.test(fullAddress) && !/\\b(flat|apartment|unit|floor|house|building)\\b/i.test(fullAddress) ||
+          !/(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})/i.test(fullAddress) ||
+          !/\d/.test(fullAddress) && !/\b(flat|apartment|unit|floor|house|building)\b/i.test(fullAddress) ||
           !isFinite(deviceQuantity) || Math.floor(deviceQuantity) !== deviceQuantity || deviceQuantity < 1 || deviceQuantity > 100 ||
           !jobType) {
         return output_({ ok: false, message: "Quote request needs a real name, valid UK postcode and full address, job type, equipment, device count and a useful job description. Placeholder/test submissions are not accepted." });
       }
-      const addressPostcode = fullAddress.match(/(?:GIR\\s?0AA|[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2})/i);
-      if (!addressPostcode || addressPostcode[0].replace(/\\s/g, "").toUpperCase() !== location.replace(/\\s/g, "").toUpperCase()) {
+      const addressPostcode = fullAddress.match(/(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})/i);
+      if (!addressPostcode || addressPostcode[0].replace(/\s/g, "").toUpperCase() !== location.replace(/\s/g, "").toUpperCase()) {
         return output_({ ok: false, message: "The postcode in the full address must match the postcode field." });
       }
     }
