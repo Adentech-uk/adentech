@@ -206,6 +206,58 @@ body{background:#eaf0f7;padding:24px 12px}
       const payload = Object.fromEntries(new FormData(form).entries());
       payload.kind = form.dataset.kind;
       payload.page = window.location.href;
+      if (payload.kind === "quote") {
+        const bad = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123+|example)$/i;
+        const postcode = /^(GIR\\s?0AA|(?:[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2}))$/i;
+        const required = [
+          ["name", "Enter your real name."],
+          ["email", "Enter a valid email address."],
+          ["location", "Enter a UK postcode in the town/postcode field."],
+          ["fullAddress", "Enter the full service address, including street and postcode."],
+          ["jobType", "Choose the type of work."],
+          ["equipment", "Tell us what equipment needs work."],
+          ["deviceQuantity", "Enter the number of devices."],
+          ["details", "Describe the actual work required in at least 20 characters."]
+        ];
+        for (const item of required) {
+          const value = String(payload[item[0]] || "").trim();
+          if (!value || bad.test(value)) {
+            status.textContent = item[1];
+            form.elements[item[0]]?.focus();
+            return;
+          }
+        }
+        if (!postcode.test(String(payload.location).trim())) {
+          status.textContent = "Please enter a valid UK postcode (for example, NW8 6DN).";
+          form.elements.location.focus(); return;
+        }
+        const address = String(payload.fullAddress).trim();
+        if (address.length < 10 || !/\\d/.test(address) && !/\\b(flat|apartment|unit|floor|house|building)\\b/i.test(address)) {
+          status.textContent = "Add a street number/name or building and a postcode so we can check the address.";
+          form.elements.fullAddress.focus(); return;
+        }
+        const addrPostcode = address.match(/(?:GIR\\s?0AA|[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2})/i);
+        if (!addrPostcode || addrPostcode[0].replace(/\\s/g,"").toUpperCase() !== String(payload.location).replace(/\\s/g,"").toUpperCase()) {
+          status.textContent = "The full address must include the same UK postcode entered above.";
+          form.elements.fullAddress.focus(); return;
+        }
+        if (String(payload.equipment).trim().length < 3 || bad.test(String(payload.equipment).trim())) {
+          status.textContent = "Enter the real equipment type, such as laptop, desktop or monitor.";
+          form.elements.equipment.focus(); return;
+        }
+        if (!/^\\d+$/.test(String(payload.deviceQuantity)) || Number(payload.deviceQuantity) < 1 || Number(payload.deviceQuantity) > 100) {
+          status.textContent = "Enter a device count from 1 to 100.";
+          form.elements.deviceQuantity.focus(); return;
+        }
+        if (String(payload.details).trim().length < 20 || bad.test(String(payload.details).trim())) {
+          status.textContent = "Please describe the actual job in at least 20 characters; placeholder text such as “test” cannot be submitted.";
+          form.elements.details.focus(); return;
+        }
+        if (bad.test(String(payload.name).trim())) {
+          status.textContent = "Enter your real name rather than a test value.";
+          form.elements.name.focus(); return;
+        }
+      }
       button.disabled = true;
       status.textContent = "Sending your request…";
       try {
