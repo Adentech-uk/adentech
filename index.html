@@ -29,7 +29,7 @@ body{background:#eaf0f7;padding:24px 12px}
 #adentech-site .at-card{border:1px solid #dce6f2;border-radius:14px;padding:22px;background:#fff}
 #adentech-site .at-icon{width:46px;height:46px;border-radius:12px;background:#e9f3ff;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:15px}
 #adentech-site .at-list{padding-left:19px;margin:12px 0 0;color:#536174;line-height:1.85}
-#adentech-site .at-muted{color:#536174}
+#adentech-site .at-muted{color:#536174}\n#adentech-site .at-form{display:flex;flex-direction:column;gap:8px;margin-top:16px}\n#adentech-site .at-label{font-size:13px;font-weight:700;color:#26384f;margin-top:5px}\n#adentech-site .at-form input,#adentech-site .at-form textarea{width:100%;padding:11px 12px;border:1px solid #cbd8e7;border-radius:8px;font:inherit;color:#172033;background:#fff}\n#adentech-site .at-form input:focus,#adentech-site .at-form textarea:focus{outline:2px solid #1683ff;outline-offset:1px}\n#adentech-site .at-form-status{font-size:13px;color:#536174;margin:4px 0 0;min-height:1em}\n#adentech-site .at-form button:disabled{opacity:.65;cursor:wait}
 #adentech-site .at-pill{display:inline-block;padding:7px 11px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:#e3efff;font-size:13px;margin:4px 5px 0 0}
 #adentech-site .at-step{background:#fff;border:1px solid #e1e7ef;border-radius:12px;padding:18px;text-align:center}
 #adentech-site .at-num{width:34px;height:34px;border-radius:50%;background:#1683ff;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 12px}
@@ -44,7 +44,7 @@ body{background:#eaf0f7;padding:24px 12px}
       <h1>Home and Small Office IT Setup, Made Simple.</h1>
       <p style="font-size:18px;color:#dce9f8;margin:0 0 20px;">Practical help setting up computers, monitors, printers and workstations — with clear communication and the work agreed in advance.</p>
       <div style="margin-bottom:20px;"><span class="at-pill">One-off projects</span><span class="at-pill">Weekend availability</span><span class="at-pill">Setup and testing</span></div>
-      <a class="at-btn" href="https://www.fiverr.com/mahad209" target="_blank" rel="noopener noreferrer">View services on Fiverr ↗</a>
+      <a class="at-btn" href="#contact">Get a Quote or Enquire ↓</a>
     </div>
     <div class="at-hero-art" style="background:#0d315d;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:22px;">
       <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Illustration of a tested computer workstation" style="display:block;">
@@ -113,12 +113,44 @@ body{background:#eaf0f7;padding:24px 12px}
   </div>
 </section>
 
-<!-- CTA -->
-<section class="at-section" style="background:#fff;text-align:center;">
-  <div class="at-wrap" style="max-width:700px;">
-    <h2>Planning a Home or Small Office Setup?</h2>
-    <p class="at-muted" style="margin:0 auto 20px;">Review the available service options and send the details through the linked Fiverr service page. Please include the equipment, number of devices, location and preferred weekend.</p>
-    <a class="at-btn" href="https://www.fiverr.com/mahad209" target="_blank" rel="noopener noreferrer">View services on Fiverr ↗</a>
+<!-- CONTACT FORMS -->
+<section id="contact" class="at-section" style="background:#eef5fc;">
+  <div class="at-wrap">
+    <div style="text-align:center;max-width:720px;margin:0 auto 28px;">
+      <h2>How Can We Help?</h2>
+      <p class="at-muted" style="margin:0;">Choose a quote request for a setup job, or send a general enquiry. We’ll confirm the details before any work or cost is agreed.</p>
+    </div>
+    <div class="at-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));">
+      <article class="at-card">
+        <div class="at-icon" aria-hidden="true">£</div>
+        <h3>Get a Quote</h3>
+        <p class="at-muted">Tell us about your equipment and what you need. We’ll review the request and reply to clarify details before providing a quote.</p>
+        <form class="at-form" data-kind="quote">
+          <label for="q-name" class="at-label">Your name</label><input id="q-name" name="name" autocomplete="name" required>
+          <label for="q-email" class="at-label">Email address</label><input id="q-email" name="email" type="email" autocomplete="email" required>
+          <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" required>
+          <label for="q-equipment" class="at-label">Equipment and quantity</label><input id="q-equipment" name="equipment" placeholder="e.g. 2 monitors, laptop, printer" required>
+          <label for="q-details" class="at-label">What would you like done?</label><textarea id="q-details" name="details" rows="4" required></textarea>
+          <label for="q-timing" class="at-label">Preferred date or weekend (optional)</label><input id="q-timing" name="timing" placeholder="Your preferred timing">
+          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Request a Quote</button>
+          <p class="at-form-status" role="status" aria-live="polite"></p>
+        </form>
+      </article>
+      <article class="at-card">
+        <div class="at-icon" aria-hidden="true">✉</div>
+        <h3>General Enquiry</h3>
+        <p class="at-muted">Ask a question about our services, availability or whether your setup is within scope.</p>
+        <form class="at-form" data-kind="enquiry">
+          <label for="e-name" class="at-label">Your name</label><input id="e-name" name="name" autocomplete="name" required>
+          <label for="e-email" class="at-label">Email address</label><input id="e-email" name="email" type="email" autocomplete="email" required>
+          <label for="e-subject" class="at-label">Subject</label><input id="e-subject" name="subject" placeholder="What is your question about?" required>
+          <label for="e-message" class="at-label">Message</label><textarea id="e-message" name="details" rows="7" required></textarea>
+          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Send Enquiry</button>
+          <p class="at-form-status" role="status" aria-live="polite"></p>
+        </form>
+      </article>
+    </div>
+    <p class="at-muted" style="font-size:13px;text-align:center;margin:20px 0 0;">Please don’t include passwords or sensitive account information. Your details will be used to respond to your request.</p>
   </div>
 </section>
 
