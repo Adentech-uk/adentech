@@ -152,16 +152,9 @@ body{background:#eaf0f7;padding:24px 12px}
           <label for="q-name" class="at-label">Your name</label><input id="q-name" name="name" autocomplete="name" required>
           <label for="q-email" class="at-label">Email address</label><input id="q-email" name="email" type="email" autocomplete="email" required>
           <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" placeholder="e.g. NW2 3RU" required>
-          <label for="q-address" class="at-label">Full service address</label><textarea id="q-address" name="fullAddress" rows="2" placeholder="Street, town/city and postcode" required></textarea>
-          <label for="q-jobtype" class="at-label">Type of work</label><select id="q-jobtype" name="jobType" required><option value="">Choose a job type</option><option>Installation / setup</option><option>Relocation / moving equipment</option><option>Connection / configuration</option><option>Troubleshooting</option><option>Testing / handover</option><option>Other / not sure</option></select>
-          <label for="q-equipment" class="at-label">Equipment and type</label><input id="q-equipment" name="equipment" placeholder="e.g. printer, laptop, monitors" required>
-          <label for="q-quantity" class="at-label">Number of devices</label><input id="q-quantity" name="deviceQuantity" type="number" min="1" max="100" step="1" placeholder="e.g. 2" required>
-          <label for="q-model" class="at-label">Make and model (if known)</label><input id="q-model" name="makeModel" placeholder="e.g. HP LaserJet model">
-          <label for="q-status" class="at-label">Current setup / device condition</label><textarea id="q-status" name="currentStatus" rows="2" placeholder="New in box, already connected, error message (no passwords), etc."></textarea>
-          <label for="q-details" class="at-label">What would you like done?</label><textarea id="q-details" name="details" rows="4" placeholder="Describe the result you need, any error messages, and what has already been tried." required></textarea>
-          <label for="q-access" class="at-label">Access, stairs and parking</label><textarea id="q-access" name="accessParking" rows="2" placeholder="Parking availability/cost, floor, lift, access restrictions"></textarea>
-          <label for="q-photos" class="at-label">Photo link (optional)</label><input id="q-photos" name="photoLink" type="url" placeholder="Optional link to photos you choose to share">
-          <label for="q-timing" class="at-label">Preferred date or weekend (optional)</label><input id="q-timing" name="timing" placeholder="Your preferred timing">
+          <label for="q-equipment" class="at-label">What equipment needs setting up?</label><input id="q-equipment" name="equipment" placeholder="e.g. one laptop and two monitors" required>
+          <label for="q-details" class="at-label">What would you like help with?</label><textarea id="q-details" name="details" rows="4" placeholder="Briefly describe what you want connected or set up." required></textarea>
+          <label for="q-timing" class="at-label">Preferred timing (optional)</label><input id="q-timing" name="timing" placeholder="e.g. weekend">
           <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Request a Quote</button>
           <p class="at-form-status" role="status" aria-live="polite"></p>
         </form>
@@ -205,6 +198,12 @@ body{background:#eaf0f7;padding:24px 12px}
       }
       const payload = Object.fromEntries(new FormData(form).entries());
       payload.kind = form.dataset.kind;
+      // Keep the public form simple; collect exact address and other details by email.
+      if (payload.kind === "quote") {
+        payload.fullAddress = "Service address to be confirmed, " + String(payload.location || "").trim();
+        payload.deviceQuantity = "1";
+        payload.jobType = "Installation / setup";
+      }
       payload.page = window.location.href;
       if (payload.kind === "quote") {
         const bad = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
