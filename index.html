@@ -201,7 +201,7 @@ body{background:#eaf0f7;padding:24px 12px}
       // Keep the public form simple; collect exact address and other details by email.
       if (payload.kind === "quote") {
         payload.fullAddress = "Service address to be confirmed, " + String(payload.location || "").trim();
-        payload.deviceQuantity = "1";
+        payload.deviceQuantity = "";
         payload.jobType = "Installation / setup";
       }
       payload.page = window.location.href;
@@ -212,10 +212,7 @@ body{background:#eaf0f7;padding:24px 12px}
           ["name", "Enter your real name."],
           ["email", "Enter a valid email address."],
           ["location", "Enter a UK postcode in the town/postcode field."],
-          ["fullAddress", "Enter the full service address, including street and postcode."],
-          ["jobType", "Choose the type of work."],
           ["equipment", "Tell us what equipment needs work."],
-          ["deviceQuantity", "Enter the number of devices."],
           ["details", "Describe the actual work required in at least 20 characters."]
         ];
         for (const item of required) {
@@ -243,10 +240,6 @@ body{background:#eaf0f7;padding:24px 12px}
         if (String(payload.equipment).trim().length < 3 || bad.test(String(payload.equipment).trim())) {
           status.textContent = "Enter the real equipment type, such as laptop, desktop or monitor.";
           form.elements.equipment.focus(); return;
-        }
-        if (!/^\d+$/.test(String(payload.deviceQuantity)) || Number(payload.deviceQuantity) < 1 || Number(payload.deviceQuantity) > 100) {
-          status.textContent = "Enter a device count from 1 to 100.";
-          form.elements.deviceQuantity.focus(); return;
         }
         if (String(payload.details).trim().length < 20 || bad.test(String(payload.details).trim())) {
           status.textContent = "Please describe the actual job in at least 20 characters; placeholder text such as “test” cannot be submitted.";
