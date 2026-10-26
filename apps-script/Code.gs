@@ -52,7 +52,7 @@ function doPost(e) {
       const equipment = clean_(data.equipment, 500);
       const deviceQuantity = Number(data.deviceQuantity);
       const jobType = clean_(data.jobType, 120);
-      const badValue = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123+|example)$/i;
+      const badValue = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123|1234|example)$/i;
       const ukPostcode = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
       if (badValue.test(name) || badValue.test(message) || message.length < 20 ||
           badValue.test(equipment) || equipment.length < 3 ||
