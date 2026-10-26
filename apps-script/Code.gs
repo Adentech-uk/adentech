@@ -179,14 +179,15 @@ function calculateLabourEstimate_(requestedHours) {
   const hours = Number(requestedHours);
   if (!isFinite(hours) || hours <= 0) {
     return {
-      labourText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum visit/labour charge (assumes up to 1 hour; confirm duration)",
-      totalText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum labour amount, before travel and parts"
+      labourText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum visit/labour charge for the first hour; duration must be reviewed",
+      totalText: "£" + MINIMUM_VISIT_CHARGE.toFixed(2) + " minimum labour amount for the first hour, before travel and parts; additional time may apply"
     };
   }
   const billableHours = Math.max(MINIMUM_BILLABLE_HOURS, hours);
-  const labour = Math.max(MINIMUM_VISIT_CHARGE, billableHours * HOURLY_LABOUR_RATE);
+  // The £50 minimum covers the first hour; additional hours are £20 each.
+  const labour = Math.max(MINIMUM_VISIT_CHARGE, MINIMUM_VISIT_CHARGE + Math.max(0, billableHours - MINIMUM_BILLABLE_HOURS) * HOURLY_LABOUR_RATE);
   return {
-    labourText: billableHours + " hour(s) at £" + HOURLY_LABOUR_RATE.toFixed(2) + "/hour, minimum charge applied where relevant: £" + labour.toFixed(2),
+    labourText: billableHours + " hour(s): £" + MINIMUM_VISIT_CHARGE.toFixed(2) + " first-hour minimum plus £" + HOURLY_LABOUR_RATE.toFixed(2) + " for each additional hour = £" + labour.toFixed(2),
     totalText: "£" + labour.toFixed(2) + " labour only, before travel and parts"
   };
 }
