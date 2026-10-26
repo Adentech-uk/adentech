@@ -53,10 +53,8 @@ function doPost(e) {
       "Submitted from: " + clean_(data.page, 500)
     ].join("\n");
 
-    GmailApp.sendEmail(owner, subject, body, { replyTo: email, name: "AdenTech Website" });
-    const escapedSubject = subject.replace(/"/g, "");
-    const threads = GmailApp.search('from:me to:me subject:"' + escapedSubject + '" newer_than:1d', 0, 10);
-    if (threads.length) label.addToThread(threads[0]);
+    const notification = GmailApp.createDraft(owner, subject, body, { replyTo: email, name: "AdenTech Website" }).send();
+    label.addToThread(notification.getThread());
 
     const acknowledgement = kind === "quote"
       ? "Thanks for contacting AdenTech and requesting a quote. We’ve received your details and will review the equipment, location and work requested. If we need clarification, we’ll reply to this email. We’ll confirm the scope and price with you before any work begins.\n\nAdenTech"
