@@ -26,11 +26,19 @@ The forms are not live until the Google Apps Script endpoint is deployed and add
 6. In `index.html`, replace `PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE` in `FORM_ENDPOINT` with that URL, then commit the file.
 7. Test both forms from the published site. Confirm the owner receives the notification and the test customer email receives an acknowledgement.
 
-### What the automation does
+### Current bot rules
 
 - Creates/reuses Gmail labels `AdenTech/Quotes` and `AdenTech/Enquiries`.
-- Labels the matching notification email and sends the details to the Google account used to deploy the script.
-- Sends the customer a receipt acknowledgement.
+- Sends a lead notification to the Google account used to deploy the script and labels that notification.
+- **Quote requests:** sends a receipt acknowledgement and creates a customer-reply draft for the owner to review. It never invents or sends a price automatically.
+- **General enquiries:** auto-answers only a narrow, clear question about the types of services offered. Questions about prices, service area, availability, technical compatibility, urgent issues and anything uncertain are escalated for owner review.
 - Uses the submitter's email as the reply-to address on the owner notification.
 
-**Important:** this initial version routes requests and sends acknowledgements; it does not calculate or promise a final quote automatically. Before enabling automated quote offers, define approved service rates or quote rules, service area, travel/parts treatment, and which jobs require manual review. Never let the bot invent prices or promise work outside the agreed scope. Avoid collecting passwords or other sensitive account details.
+### Still required before going live
+
+- Replace the form endpoint placeholder in `index.html` with the deployed Apps Script `/exec` URL.
+- Set the exact towns/postcodes served in `SERVICE_AREA` in `apps-script/Code.gs` before adding any service-area auto-replies. Do not claim local coverage until this is configured.
+- Submit test quote and enquiry forms and verify the labels, notification emails, acknowledgement emails and quote draft.
+- Before allowing any customer-facing automatic quote, define written rules for labour rates, minimum charge, travel, parts, VAT/tax if applicable, remote vs on-site jobs, cancellations, and jobs that must always be manually reviewed. Keep owner approval enabled until the rules are tested.
+
+Never let the bot invent prices or promise work outside the agreed scope. Avoid collecting passwords or other sensitive account details.
