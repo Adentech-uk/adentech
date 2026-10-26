@@ -207,7 +207,7 @@ body{background:#eaf0f7;padding:24px 12px}
       payload.kind = form.dataset.kind;
       payload.page = window.location.href;
       if (payload.kind === "quote") {
-        const bad = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123|1234|example)$/i;
+        const bad = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
         const postcode = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
         const required = [
           ["name", "Enter your real name."],
