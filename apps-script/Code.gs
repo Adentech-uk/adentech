@@ -46,6 +46,29 @@ function doPost(e) {
     const owner = Session.getEffectiveUser().getEmail();
     if (!owner) throw new Error("No owner email is available. Deploy while signed in to the receiving Google account.");
     const isQuote = kind === "quote";
+    if (isQuote) {
+      const location = clean_(data.location, 200);
+      const fullAddress = clean_(data.fullAddress, 500);
+      const equipment = clean_(data.equipment, 500);
+      const deviceQuantity = Number(data.deviceQuantity);
+      const jobType = clean_(data.jobType, 120);
+      const badValue = /^(test|testing|asdf|qwerty|n\\/?a|none|unknown|xxx|123+|example)$/i;
+      const ukPostcode = /^(GIR\\s?0AA|(?:[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2}))$/i;
+      if (badValue.test(name) || badValue.test(message) || message.length < 20 ||
+          badValue.test(equipment) || equipment.length < 3 ||
+          !ukPostcode.test(location) ||
+          fullAddress.length < 10 ||
+          !/(?:GIR\\s?0AA|[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2})/i.test(fullAddress) ||
+          !/\\d/.test(fullAddress) && !/\\b(flat|apartment|unit|floor|house|building)\\b/i.test(fullAddress) ||
+          !isFinite(deviceQuantity) || Math.floor(deviceQuantity) !== deviceQuantity || deviceQuantity < 1 || deviceQuantity > 100 ||
+          !jobType) {
+        return output_({ ok: false, message: "Quote request needs a real name, valid UK postcode and full address, job type, equipment, device count and a useful job description. Placeholder/test submissions are not accepted." });
+      }
+      const addressPostcode = fullAddress.match(/(?:GIR\\s?0AA|[A-Z]{1,2}\\d[A-Z\\d]?\\s?\\d[A-Z]{2})/i);
+      if (!addressPostcode || addressPostcode[0].replace(/\\s/g, "").toUpperCase() !== location.replace(/\\s/g, "").toUpperCase()) {
+        return output_({ ok: false, message: "The postcode in the full address must match the postcode field." });
+      }
+    }
     const label = getLabel_(isQuote ? QUOTE_LABEL : ENQUIRY_LABEL);
     const ticket = Utilities.getUuid().slice(0, 8).toUpperCase();
     const subject = (isQuote ? "[AdenTech Quote " : "[AdenTech Enquiry ") + ticket + "] " + name;
@@ -61,6 +84,7 @@ function doPost(e) {
     const timing = clean_(data.timing, 200);
     const enquirySubject = clean_(data.subject, 250);
     const mapsUrl = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(BASE_POSTCODE) + "&destination=" + encodeURIComponent(fullAddress || location);
+    const addressSearchUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(fullAddress || location);
     const body = [
       "Reference: " + ticket,
       "Type: " + (isQuote ? "Quote request — owner approval required" : "General enquiry"),
@@ -82,7 +106,7 @@ function doPost(e) {
       message,
       "",
       "Submitted from: " + clean_(data.page, 500),
-      isQuote ? "Travel route (check route and round-trip miles before quoting): " + mapsUrl : ""
+      isQuote ? "Google Maps address check (owner must confirm the exact pin/address): " + addressSearchUrl + "\\nTravel route (check route and round-trip miles before quoting): " + mapsUrl : ""
     ].join("\n");
     const notification = GmailApp.createDraft(owner, subject, body, {
       replyTo: email, name: BUSINESS_NAME + " Website"
@@ -96,7 +120,9 @@ function doPost(e) {
         "",
         "Thanks for asking AdenTech for a quote (reference " + ticket + ").",
         "",
-        "INDICATIVE ESTIMATE — FOR OWNER REVIEW; NOT A CONFIRMED QUOTE",
+        "DRAFT QUOTE — OWNER REVIEW REQUIRED; DO NOT SEND UNTIL VERIFIED",
+        "ADDRESS CHECK: Confirm the exact customer address/pin in Google Maps: " + addressSearchUrl,
+        "SCOPE CHECK: Verify the Windows licence, whether data must be preserved/backed up, account access, device specifications and monitor connections before confirming duration or price.",
         "Labour: " + estimate.labourText,
         "Travel: To be confirmed after checking the route from " + BASE_POSTCODE + " and round-trip mileage (£" + MILEAGE_RATE.toFixed(2) + " per mile).",
         "Parts / materials: Not included; confirm requirements and cost before proceeding.",
@@ -142,6 +168,8 @@ function doPost(e) {
         "Access / parking: " + (accessParking || "Not supplied"),
         "Photo link: " + (photoLink || "Not supplied"),
         "Preferred timing: " + (timing || "Not specified"),
+        "Google Maps address check: " + addressSearchUrl,
+        "Travel route (check exact route and round-trip mileage): " + mapsUrl,
         "",
         "PRICING POLICY — SUBJECT TO REVIEW",
         "Minimum visit / labour charge: £" + MINIMUM_VISIT_CHARGE.toFixed(2) + " (first hour, subject to confirmed scope).",
