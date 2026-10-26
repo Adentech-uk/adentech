@@ -122,9 +122,40 @@ function doPost(e) {
         "AdenTech"
       ].join("\n");
       GmailApp.createDraft(email, "DRAFT — AdenTech quote for approval — " + ticket, quoteDraftBody, { name: BUSINESS_NAME });
-      GmailApp.sendEmail(email, "We’ve received your AdenTech quote request — " + ticket,
-        "Thanks for requesting a quote from AdenTech. We’ve received your details and will review the scope and travel before confirming a price. This acknowledgement is not a quote or booking.\n\nReference: " + ticket + "\n\nAdenTech",
-        { name: BUSINESS_NAME });
+      const customerSummary = [
+        "Thanks for requesting a quote from AdenTech. We’ve received the details below.",
+        "",
+        "REFERENCE: " + ticket,
+        "STATUS: Received — awaiting review. This email is not a confirmed quote or booking.",
+        "",
+        "YOUR REQUEST",
+        "Name: " + name,
+        "Email: " + email,
+        "Town / postcode: " + (location || "Not supplied"),
+        "Full service address: " + (fullAddress || "Not supplied"),
+        "Job type: " + (jobType || "Not specified"),
+        "Equipment: " + (equipment || "Not specified"),
+        "Number of devices: " + (deviceQuantity || "Not specified"),
+        "Make / model: " + (makeModel || "Not supplied"),
+        "Current setup / condition: " + (currentStatus || "Not supplied"),
+        "Requested work: " + message,
+        "Access / parking: " + (accessParking || "Not supplied"),
+        "Photo link: " + (photoLink || "Not supplied"),
+        "Preferred timing: " + (timing || "Not specified"),
+        "",
+        "PRICING POLICY — SUBJECT TO REVIEW",
+        "Minimum visit / labour charge: £" + MINIMUM_VISIT_CHARGE.toFixed(2) + " (first hour, subject to confirmed scope).",
+        "Additional labour: £" + HOURLY_LABOUR_RATE.toFixed(2) + " per hour after the first hour.",
+        "Travel: £" + MILEAGE_RATE.toFixed(2) + " per round-trip mile from " + BASE_POSTCODE + ", after the route is checked.",
+        "Parts / materials: not included; confirmed separately before proceeding.",
+        "VAT: not charged; AdenTech is not VAT registered.",
+        "",
+        "We have not assumed a job duration or calculated a travel amount yet. We’ll review the work, confirm the likely duration and route mileage, and agree the final price with you before any work begins.",
+        "",
+        "Kind regards,",
+        "AdenTech"
+      ].join("\n");
+      GmailApp.sendEmail(email, "AdenTech quote request received — " + ticket, customerSummary, { name: BUSINESS_NAME });
       return output_({ ok: true, reference: ticket, workflow: "quote-awaiting-owner-approval" });
     }
 
