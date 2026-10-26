@@ -134,7 +134,7 @@ function draftQuoteAfterCustomerReply_() {
     const firstBody = messages.length ? messages[0].getPlainBody() : "";
     const reference = request.reference || findReference_(thread.getFirstMessageSubject() + "\n" + firstBody);
     // Scope processing to AdenTech-related subjects and references; do not treat arbitrary order IDs as quote requests.
-    if (!reference || !/adentech/i.test(thread.getFirstMessageSubject())) return;
+    if (!reference || !/adentech/i.test(thread.getFirstMessageSubject()) || !/(quote|request|follow[- ]?up)/i.test(thread.getFirstMessageSubject())) return;
 
     const incomingReplies = messages.filter(function (message) {
       const from = extractEmail_(message.getFrom()).toLowerCase();
