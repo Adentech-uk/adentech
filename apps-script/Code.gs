@@ -83,15 +83,17 @@ function doPost(e) {
     const photoLink = safeUrl_(data.photoLink);
     const timing = clean_(data.timing, 200);
     const enquirySubject = clean_(data.subject, 250);
-    const mapsUrl = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(BASE_POSTCODE) + "&destination=" + encodeURIComponent(fullAddress || location);
-    const addressSearchUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(fullAddress || location);
+    const addressNeedsConfirmation = /^Service address to be confirmed/i.test(fullAddress);
+    const addressForMaps = addressNeedsConfirmation ? location : (fullAddress || location);
+    const mapsUrl = "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(BASE_POSTCODE) + "&destination=" + encodeURIComponent(addressForMaps);
+    const addressSearchUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addressForMaps);
     const body = [
       "Reference: " + ticket,
       "Type: " + (isQuote ? "Quote request — owner approval required" : "General enquiry"),
       "Name: " + name,
       "Email: " + email,
       "Town / postcode: " + location,
-      "Full service address: " + (fullAddress || "Not supplied"),
+      "Full service address: " + (addressNeedsConfirmation ? "To be confirmed by email" : (fullAddress || "Not supplied")),
       "Equipment: " + equipment,
       "Device quantity: " + (deviceQuantity || "Not specified"),
       "Make / model: " + (makeModel || "Not supplied"),
@@ -132,7 +134,7 @@ function doPost(e) {
         "",
         "Your request:",
         "Town / postcode: " + (location || "Not supplied"),
-        "Service address: " + (fullAddress || "To be confirmed"),
+        "Service address: " + (addressNeedsConfirmation ? "To be confirmed by email" : (fullAddress || "To be confirmed")),
         "Job type: " + (jobType || "Not specified"),
         "Equipment: " + (equipment || "Not specified"),
         "Quantity: " + (deviceQuantity || "Not specified"),
@@ -158,7 +160,7 @@ function doPost(e) {
         "Name: " + name,
         "Email: " + email,
         "Town / postcode: " + (location || "Not supplied"),
-        "Full service address: " + (fullAddress || "Not supplied"),
+        "Full service address: " + (addressNeedsConfirmation ? "To be confirmed by email" : (fullAddress || "Not supplied")),
         "Job type: " + (jobType || "Not specified"),
         "Equipment: " + (equipment || "Not specified"),
         "Number of devices: " + (deviceQuantity || "Not specified"),
