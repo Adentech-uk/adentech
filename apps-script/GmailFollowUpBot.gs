@@ -131,7 +131,7 @@ function draftQuoteAfterCustomerReply_() {
     if (!messages || messages.length < 2) return;
 
     const request = extractRequestDetails_(thread);
-    const reference = request.reference || findReference_(thread.getFirstMessageSubject() + "\n" + thread.getFirstMessageBody());
+    const firstBody = messages.length ? messages[0].getPlainBody() : "";\n    const reference = request.reference || findReference_(thread.getFirstMessageSubject() + "\n" + firstBody);
     if (!reference) return;
 
     const incomingReplies = messages.filter(function (message) {
