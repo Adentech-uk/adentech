@@ -23,6 +23,13 @@ const MINIMUM_VISIT_CHARGE = 50;
 const MILEAGE_RATE = 0.45;
 const COMPLETED_RETENTION_DAYS = 30;
 const STATE_PREFIX = "AT_REQUEST_";
+const RATE_EMAIL_PREFIX = "AT_RATE_EMAIL_";
+const RATE_GLOBAL_KEY = "AT_RATE_GLOBAL";
+const RATE_WINDOW_MS = 60 * 60 * 1000;
+const RATE_TIMESTAMP_FUTURE_ALLOWANCE_MS = 5 * 60 * 1000;
+const RATE_EMAIL_MAX = 5;
+const RATE_GLOBAL_MAX = 60;
+const MAX_GMAIL_SEARCH_THREADS = 50;
 const UUID_V4_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const UK_POSTCODE_PATTERN = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
 const PAYLOAD_FIELDS = ["kind","name","email","location","equipment","details","timing","subject","existingReference","fullAddress","deviceQuantity","jobType","photoLink"];
@@ -33,6 +40,19 @@ function doPost(e) {
   let state = null;
   let locked = false;
   try {
+    // Apps Script web-app events do not expose a trusted client IP. Apply a
+    // server-wide rolling cap to every POST before parsing caller data, then a
+    // per-address cap after validation. Neither caller UUIDs nor browser code
+    // are used as abuse controls.
+    const lock = LockService.getScriptLock();
+    if (!lock.tryLock(10000)) return output_({ok:false, retryable:true, message:"The intake is busy. Please retry unchanged shortly."});
+    locked = true;
+    const properties = PropertiesService.getScriptProperties();
+    pruneCompleted_(properties);
+    const globalRateLimit = consumeGlobalRateLimit_(properties);
+    if (!globalRateLimit.ok) return output_({ok:false, retryable:true, retryAfterSeconds:globalRateLimit.retryAfterSeconds,
+      message:"The intake is receiving requests too quickly. Please wait and retry unchanged."});
+
     const raw = e && e.postData && e.postData.contents;
     if (typeof raw !== "string" || raw.length > 20000) return output_({ok:false, message:"Please review the form fields and try again."});
     const data = JSON.parse(raw);
@@ -44,13 +64,7 @@ function doPost(e) {
     if (!validated.ok) return output_({ok:false, message:validated.message});
     const request = validated.request;
 
-    const lock = LockService.getScriptLock();
-    if (!lock.tryLock(10000)) return output_({ok:false, retryable:true, message:"Your request is being checked. Please retry shortly with the same answers."});
-    locked = true;
-
     stateKey = STATE_PREFIX + requestId.replace(/-/g, "").toUpperCase();
-    const properties = PropertiesService.getScriptProperties();
-    pruneCompleted_(properties);
     const payloadHash = digest_(JSON.stringify(request.payload));
     const saved = properties.getProperty(stateKey);
     if (saved) {
@@ -60,17 +74,23 @@ function doPost(e) {
       if (state.status === "manual_review" && state.phases.manualReviewNotification === "done") {
         return output_({ok:false, retryable:false, message:"Your request needs owner review. Please contact AdenTech and quote reference " + state.reference + "."});
       }
-    } else {
+    }
+
+    const rateLimit = consumeEmailRateLimit_(properties, request.email);
+    if (!rateLimit.ok) return output_({ok:false, retryable:true, retryAfterSeconds:rateLimit.retryAfterSeconds,
+      message:"The intake is receiving requests too quickly. Please wait and retry unchanged."});
+
+    if (!saved) {
       state = newState_(requestId, payloadHash, request.kind);
       properties.setProperty(stateKey, JSON.stringify(state));
     }
 
     if (!reconcileAttemptingPhases_(state, request, properties, stateKey)) {
-      if (state.phases.manualReviewNotification === "pending") sendManualReviewNotice_(state, request, properties, stateKey);
+      if (state.phases.manualReviewNotification === "pending" || state.phases.manualReviewNotification === "attempting") sendManualReviewNotice_(state, request, properties, stateKey);
       return output_({ok:false, retryable:false, message:"We could not safely confirm the request status. AdenTech will review it manually; reference " + state.reference + "."});
     }
     if (state.status === "manual_review") {
-      if (state.phases.manualReviewNotification === "pending") sendManualReviewNotice_(state, request, properties, stateKey);
+      if (state.phases.manualReviewNotification === "pending" || state.phases.manualReviewNotification === "attempting") sendManualReviewNotice_(state, request, properties, stateKey);
       return output_({ok:false, retryable:false, message:"Your request needs owner review. Please contact AdenTech and quote reference " + state.reference + "."});
     }
 
@@ -161,6 +181,10 @@ function doPost(e) {
     saveState_(properties, stateKey, state);
     return output_({ok:true, reference:state.reference, workflow:state.workflow});
   } catch (err) {
+    if (err && err.code === "RATE_LIMIT_STATE_CORRUPT") {
+      console.error("AdenTech global rate-limit state is corrupt; explicit repair is required.");
+      return output_({ok:false, retryable:false, message:"The online form is temporarily unavailable. Please contact AdenTech directly."});
+    }
     if (state && stateKey) {
       try {
         state.status = state.status === "manual_review" ? "manual_review" : "incomplete";
@@ -214,7 +238,7 @@ function validateRequest_(data) {
   payload.kind = data.kind;
   if (payload.fullAddress) return {ok:false, message:"Please provide only a town or postcode here. AdenTech will request and verify the full address if needed."};
   if (!payload.name || !payload.email || !payload.details) return {ok:false, message:"Please provide your name, email address and message."};
-  if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(payload.email)) return {ok:false, message:"Please provide a valid email address."};
+  if (!isValidEmailAddress_(payload.email)) return {ok:false, message:"Please provide a valid email address."};
   if (payload.photoLink && !/^https:\/\//i.test(payload.photoLink)) payload.photoLink = "";
 
   const bad = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
@@ -233,6 +257,59 @@ function validateRequest_(data) {
     (UK_POSTCODE_PATTERN.test(payload.location) ? "postcode_only_unverified" : "town_or_area_unverified");
   return {ok:true, request:{requestId:String(data.requestId).trim().toLowerCase(), kind:payload.kind, name:payload.name, email:payload.email, message:payload.details,
     existingReference:payload.existingReference.toUpperCase(), locationStatus:locationStatus, payload:payload}};
+}
+
+// Accept a practical ASCII dot-atom mailbox and DNS domain. Quoted local parts
+// and address literals are intentionally unsupported by the public form.
+function isValidEmailAddress_(email) {
+  if (typeof email !== "string" || email.length > 254) return false;
+  const at = email.indexOf("@");
+  if (at < 1 || at !== email.lastIndexOf("@")) return false;
+  const local = email.slice(0, at);
+  const domain = email.slice(at + 1);
+  if (local.length > 64 || domain.length > 253) return false;
+  const localPattern = /^[A-Z0-9!#$%&'*+\x2f=?^_`{|}~-]+(?:\.[A-Z0-9!#$%&'*+\x2f=?^_`{|}~-]+)*$/i;
+  const domainPattern = /^(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,63}$/i;
+  return localPattern.test(local) && domainPattern.test(domain);
+}
+
+function consumeGlobalRateLimit_(properties) {
+  const now = Date.now();
+  const cutoff = now - RATE_WINDOW_MS;
+  const globalTimes = readRateTimes_(properties, RATE_GLOBAL_KEY).filter(function(time) {return time > cutoff;});
+  if (globalTimes.length >= RATE_GLOBAL_MAX) {
+    return {ok:false, retryAfterSeconds:Math.max(1, Math.ceil((globalTimes[0] + RATE_WINDOW_MS - now) / 1000))};
+  }
+
+  globalTimes.push(now);
+  properties.setProperty(RATE_GLOBAL_KEY, JSON.stringify(globalTimes));
+  return {ok:true};
+}
+
+function consumeEmailRateLimit_(properties, email) {
+  const now = Date.now();
+  const cutoff = now - RATE_WINDOW_MS;
+  const emailKey = RATE_EMAIL_PREFIX + digest_(email.toLowerCase()).replace(/[^A-Za-z0-9_-]/g, "");
+  const emailTimes = readRateTimes_(properties, emailKey).filter(function(time) {return time > cutoff;});
+  if (emailTimes.length >= RATE_EMAIL_MAX) {
+    return {ok:false, retryAfterSeconds:Math.max(1, Math.ceil((emailTimes[0] + RATE_WINDOW_MS - now) / 1000))};
+  }
+
+  emailTimes.push(now);
+  // If this write fails, doPost aborts before creating request state or Gmail
+  // artefacts (fail closed).
+  properties.setProperty(emailKey, JSON.stringify(emailTimes));
+  return {ok:true};
+}
+
+function readRateTimes_(properties, key) {
+  const saved = properties.getProperty(key);
+  if (!saved) return [];
+  const values = JSON.parse(saved);
+  if (!Array.isArray(values) || values.some(function(value) {return typeof value !== "number" || !isFinite(value);})) {
+    throw new Error("Rate-limit state is invalid");
+  }
+  return values;
 }
 
 function findQuoteThreadByReference_(reference, email) {
@@ -319,23 +396,26 @@ function reconcileAttemptingPhases_(state, request, properties, stateKey) {
     for (const phase in state.phases) {
       if (state.phases[phase] !== "attempting") continue;
       if (phase === "ownerNotification") {
-        const thread = findUniqueMarkedThread_(marker + "-OWNER", "in:sent");
-        if (!thread) return markManualReview_(state, properties, stateKey);
-        state.ownerThreadId = thread.getId();
+        const found = findUniqueMarkedMessage_(marker + "-OWNER", "in:sent");
+        if (found.status !== "matched") return markManualReview_(state, properties, stateKey);
+        state.ownerThreadId = found.thread.getId();
         if (state.requiresManualReview) state.phases.manualReviewNotification = "done";
       } else if (phase === "quoteDraft") {
-        const drafts = GmailApp.search('in:drafts subject:"' + marker + '-DRAFT"', 0, 20);
-        const matches = exactMarkerThreads_(drafts, marker + "-DRAFT");
-        if (matches.length !== 1) return markManualReview_(state, properties, stateKey);
+        const found = findUniqueMarkedMessage_(marker + "-DRAFT", "in:drafts");
+        if (found.status !== "matched") return markManualReview_(state, properties, stateKey);
       } else if (phase === "acknowledgement") {
-        const thread = findUniqueMarkedThread_(marker + "-ACK", "in:sent");
-        if (!thread) return markManualReview_(state, properties, stateKey);
+        const found = findUniqueMarkedMessage_(marker + "-ACK", "in:sent");
+        if (found.status !== "matched") return markManualReview_(state, properties, stateKey);
       } else if (phase === "manualReviewNotification") {
-        const thread = findUniqueMarkedThread_(marker + "-REVIEW", "in:sent");
-        if (!thread) return markManualReview_(state, properties, stateKey);
+        const found = findUniqueMarkedMessage_(marker + "-REVIEW", "in:sent");
+        if (found.status !== "matched") return markManualReview_(state, properties, stateKey);
       } else if (phase === "ownerLabel") {
-        const thread = state.ownerThreadId ? GmailApp.getThreadById(state.ownerThreadId) : findUniqueMarkedThread_(marker + "-OWNER", "in:sent");
-        if (!thread) return markManualReview_(state, properties, stateKey);
+        let thread = state.ownerThreadId ? GmailApp.getThreadById(state.ownerThreadId) : null;
+        if (!thread) {
+          const found = findUniqueMarkedMessage_(marker + "-OWNER", "in:sent");
+          if (found.status !== "matched") return markManualReview_(state, properties, stateKey);
+          thread = found.thread;
+        }
         getOrCreateLabel_(request.kind === "quote" ? QUOTE_LABEL : ENQUIRY_LABEL).addToThread(thread);
         state.ownerThreadId = thread.getId();
       } else if (phase === "existingThreadLabel") {
@@ -354,12 +434,30 @@ function reconcileAttemptingPhases_(state, request, properties, stateKey) {
 }
 
 function sendManualReviewNotice_(state, request, properties, stateKey) {
-  if (state.phases.manualReviewNotification !== "pending") return;
+  const phase = state.phases.manualReviewNotification;
+  if (phase !== "pending" && phase !== "attempting") return;
+  const marker = "AT-" + request.requestId + "-REVIEW";
+  if (phase === "attempting") {
+    // An interrupted send may already have reached Gmail. Only close the phase
+    // when its unique sent message can be confirmed; never resend on uncertainty.
+    let found;
+    try {
+      found = findUniqueMarkedMessage_(marker, "in:sent");
+    } catch (err) {
+      found = {status:"uncertain"};
+    }
+    if (found.status === "matched") {
+      state.phases.manualReviewNotification = "done";
+      saveState_(properties, stateKey, state);
+      return;
+    }
+    console.warn("AdenTech manual-review notice could not be safely confirmed; owner must review request reference=" + state.reference);
+    return;
+  }
   const owner = Session.getEffectiveUser().getEmail();
   if (!owner) return;
   state.phases.manualReviewNotification = "attempting";
   saveState_(properties, stateKey, state);
-  const marker = "AT-" + request.requestId + "-REVIEW";
   const reviewBody = [
     "AdenTech could not safely reconcile request processing. Please review it manually.",
     "Reference: " + state.reference,
@@ -374,16 +472,22 @@ function sendManualReviewNotice_(state, request, properties, stateKey) {
   saveState_(properties, stateKey, state);
 }
 
-function findUniqueMarkedThread_(marker, scope) {
-  const threads = GmailApp.search(scope + ' subject:"' + marker + '"', 0, 20);
-  const matches = exactMarkerThreads_(threads, marker);
-  return matches.length === 1 ? matches[0] : null;
-}
-
-function exactMarkerThreads_(threads, marker) {
-  return threads.filter(function(thread) {
-    return thread.getMessages().some(function(message) {return (message.getSubject() || "").indexOf(marker) >= 0;});
+function findUniqueMarkedMessage_(marker, scope) {
+  const threads = GmailApp.search(scope + ' subject:"' + marker + '"', 0, MAX_GMAIL_SEARCH_THREADS + 1);
+  // Gmail returns threads, which may contain multiple marked messages. A full
+  // page is not proof the search was complete; treat it as uncertain.
+  if (threads.length > MAX_GMAIL_SEARCH_THREADS) return {status:"uncertain"};
+  const matches = [];
+  threads.forEach(function(thread) {
+    thread.getMessages().forEach(function(message) {
+      if ((message.getSubject() || "").indexOf(marker) >= 0) {
+        matches.push({message:message, thread:thread, messageId:message.getId()});
+      }
+    });
   });
+  if (matches.length === 0) return {status:"not_found"};
+  if (matches.length !== 1) return {status:"uncertain"};
+  return {status:"matched", message:matches[0].message, thread:matches[0].thread, messageId:matches[0].messageId};
 }
 
 function getOwnerThread_(state, requestId) {
@@ -391,9 +495,9 @@ function getOwnerThread_(state, requestId) {
     const savedThread = GmailApp.getThreadById(state.ownerThreadId);
     if (savedThread) return savedThread;
   }
-  const thread = findUniqueMarkedThread_("AT-" + requestId + "-OWNER", "in:sent");
-  if (!thread) throw new Error("Owner notification thread is unavailable");
-  return thread;
+  const found = findUniqueMarkedMessage_("AT-" + requestId + "-OWNER", "in:sent");
+  if (found.status !== "matched") throw new Error("Owner notification search is uncertain or unavailable");
+  return found.thread;
 }
 
 function getOrCreateLabel_(name) {
@@ -413,8 +517,30 @@ function saveState_(properties, key, state) {
 
 function pruneCompleted_(properties) {
   const all = properties.getProperties();
-  const cutoff = Date.now() - COMPLETED_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const cutoff = now - COMPLETED_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const rateCutoff = now - RATE_WINDOW_MS;
   Object.keys(all).forEach(function(key) {
+    if (key === RATE_GLOBAL_KEY || key.indexOf(RATE_EMAIL_PREFIX) === 0) {
+      let times;
+      try {
+        times = JSON.parse(all[key]);
+        if (!Array.isArray(times) || times.some(function(value) {
+          return typeof value !== "number" || !isFinite(value) || value < 0 || value > now + RATE_TIMESTAMP_FUTURE_ALLOWANCE_MS;
+        })) {
+          throw new Error("Rate-limit state is invalid");
+        }
+      } catch (rateStateError) {
+        if (key === RATE_GLOBAL_KEY) throw globalRateLimitStateError_();
+        console.warn("Removed malformed per-email rate-limit counter.");
+        properties.deleteProperty(key);
+        return;
+      }
+      const recent = times.filter(function(value) {return value > rateCutoff;});
+      if (recent.length) properties.setProperty(key, JSON.stringify(recent));
+      else properties.deleteProperty(key);
+      return;
+    }
     if (key.indexOf(STATE_PREFIX) !== 0) return;
     try {
       const record = JSON.parse(all[key]);
@@ -423,6 +549,12 @@ function pruneCompleted_(properties) {
       // Malformed state is retained for manual recovery.
     }
   });
+}
+
+function globalRateLimitStateError_() {
+  const err = new Error("Global rate-limit state is invalid; explicit repair is required.");
+  err.code = "RATE_LIMIT_STATE_CORRUPT";
+  return err;
 }
 
 function digest_(value) {
