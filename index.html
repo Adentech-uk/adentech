@@ -56,7 +56,7 @@ body{background:#eaf0f7;padding:24px 12px}
       <h1>Home and Small Office IT Setup, Made Simple.</h1>
       <p style="font-size:18px;color:#dce9f8;margin:0 0 20px;">Practical help setting up computers, monitors, printers and workstations — with clear communication and the work agreed in advance.</p>
       <div style="margin-bottom:20px;"><span class="at-pill">One-off projects</span><span class="at-pill">Weekend availability</span><span class="at-pill">Setup and testing</span></div>
-      <a class="at-btn" href="#contact">Get a Quote or Enquire ↓</a>
+      <a class="at-btn" href="#contact">Get a quote ↓</a>
     </div>
     <div class="at-hero-art" style="background:#0d315d;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:22px;">
       <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Illustration of a tested computer workstation" style="display:block;">
@@ -130,32 +130,22 @@ body{background:#eaf0f7;padding:24px 12px}
   <div class="at-wrap">
     <div style="text-align:center;max-width:720px;margin:0 auto 28px;">
       <h2>How Can We Help?</h2>
-      <p class="at-muted" style="margin:0;">Choose a quote request for a setup job, or send a general enquiry. Review the pricing policy below; we’ll confirm the job scope, estimated duration and travel before any work or cost is agreed.</p>
-    </div>
-    <div style="max-width:820px;margin:0 auto 26px;background:#fff;border:1px solid #dce6f2;border-radius:14px;padding:20px 22px;">
-      <h3 style="margin-bottom:8px;">How pricing works</h3>
-      <ul class="at-list" style="margin-top:6px;">
-        <li>Minimum visit / labour charge: £50 (first hour, subject to scope confirmation).</li>
-        <li>Additional labour: £20 per hour after the first hour; duration is confirmed after reviewing the work.</li>
-        <li>Travel: £0.45 per round-trip mile from NW8, calculated after checking the route.</li>
-        <li>Parts and materials are additional and will be confirmed before purchase or work.</li>
-        <li>AdenTech is not VAT registered, so VAT is not added.</li>
-      </ul>
-      <p class="at-muted" style="font-size:13px;margin-bottom:0;">Any figure provided before the job and travel are reviewed is indicative only. No work or booking is confirmed until you approve the final scope and price.</p>
+      <p class="at-muted" style="margin:0;">Tell us what equipment needs setting up and what you would like done. We’ll review the scope and reply with any questions before confirming a quote. No work is booked until you approve it.</p>
     </div>
     <div class="at-grid at-contact-grid">
       <article class="at-card">
-        <div class="at-icon" aria-hidden="true">£</div>
+        <div class="at-icon" aria-hidden="true">✓</div>
         <h3>Get a Quote</h3>
         <p class="at-muted">Tell us about your equipment and what you need. We’ll review the request and reply to clarify details before providing a quote.</p>
         <form class="at-form" data-kind="quote">
           <label for="q-name" class="at-label">Your name</label><input id="q-name" name="name" autocomplete="name" required>
           <label for="q-email" class="at-label">Email address</label><input id="q-email" name="email" type="email" autocomplete="email" required>
           <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" placeholder="e.g. NW2 3RU" required>
+          <label for="q-reference" class="at-label">Existing AdenTech reference (optional)</label><input id="q-reference" name="existingReference" maxlength="16" placeholder="Add this only if you’re following up on a quote request">
           <label for="q-equipment" class="at-label">What equipment needs setting up?</label><input id="q-equipment" name="equipment" placeholder="e.g. one laptop and two monitors" required>
           <label for="q-details" class="at-label">What would you like help with?</label><textarea id="q-details" name="details" rows="4" placeholder="Briefly describe what you want connected or set up." required></textarea>
           <label for="q-timing" class="at-label">Preferred timing (optional)</label><input id="q-timing" name="timing" placeholder="e.g. weekend">
-          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Request a Quote</button>
+          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Get a quote</button>
           <p class="at-form-status" role="status" aria-live="polite"></p>
         </form>
       </article>
@@ -187,31 +177,138 @@ body{background:#eaf0f7;padding:24px 12px}
 (function(){
   // Deploy apps-script/Code.gs as a Google Apps Script Web App, then paste its /exec URL here.
   const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbwgeEkPPd77azgFauKAKdJ1eIjzwqPhcvojv4OIreCYulqyK87Ff7Dw0zAzog1gT5PE/exec";
+  const PAYLOAD_FIELDS = ["kind","name","email","location","equipment","details","timing","subject","existingReference","fullAddress","deviceQuantity","jobType"];
+  const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const STORAGE_VERSION = 2;
+  const MAX_PENDING_REQUESTS = 5;
+
+  function canonicalPayload(payload) {
+    return JSON.stringify(PAYLOAD_FIELDS.map(function(key){return [key, String(payload[key] || "").trim()];}));
+  }
+  function getSecureUuid() {
+    if (!window.crypto || typeof window.crypto.getRandomValues !== "function") return "";
+    if (typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, function(byte){return byte.toString(16).padStart(2,"0");}).join("");
+    return hex.slice(0,8)+"-"+hex.slice(8,12)+"-"+hex.slice(12,16)+"-"+hex.slice(16,20)+"-"+hex.slice(20);
+  }
+  function storageFor() {
+    try {
+      return window.sessionStorage;
+    } catch (storageError) {
+      return null;
+    }
+  }
+  function payloadFor(form) {
+    const submitted = Object.fromEntries(new FormData(form).entries());
+    const kind = form.dataset.kind;
+    const payload = {};
+    PAYLOAD_FIELDS.forEach(function(key) {
+      payload[key] = String(submitted[key] || "").trim();
+    });
+    payload.kind = kind;
+    payload.fullAddress = "";
+    payload.deviceQuantity = "";
+    payload.jobType = kind === "quote" ? "Installation / setup" : "";
+    return payload;
+  }
+  function restorePayload(form, payload) {
+    Array.from(form.elements).forEach(function(element) {
+      if (element.name && Object.prototype.hasOwnProperty.call(payload, element.name)) {
+        element.value = payload[element.name];
+      }
+    });
+  }
+  function isFormBlank(form) {
+    return Array.from(form.elements).every(function(element) {
+      return !element.name || !String(element.value || "").trim();
+    });
+  }
+
   document.querySelectorAll("#adentech-site .at-form").forEach(function(form){
+    const storageKey = "adentech-pending-v" + STORAGE_VERSION + "-" + form.dataset.kind;
+    const status = form.querySelector(".at-form-status");
+    let storage = storageFor();
+    let storageAvailable = !!storage;
+    let pendingRequests = [];
+    let pendingStateNeedsReview = false;
+    if (storage) {
+      try {
+        const legacyKey = "adentech-pending-" + form.dataset.kind;
+        if (storage.getItem(legacyKey)) {
+          pendingStateNeedsReview = true;
+          storage.setItem(storageKey + "-review-required", "1");
+          storage.removeItem(legacyKey);
+          status.textContent = "An earlier saved request could not be restored safely. Contact AdenTech before resubmitting if delivery may have occurred.";
+        }
+        pendingStateNeedsReview = storage.getItem(storageKey + "-review-required") === "1";
+        const saved = JSON.parse(storage.getItem(storageKey) || "null");
+        if (saved && saved.version === STORAGE_VERSION && saved.kind === form.dataset.kind && Array.isArray(saved.requests)) {
+          pendingRequests = saved.requests.filter(function(record) {
+            return record && UUID_V4.test(record.requestId) && record.payload && record.payload.kind === form.dataset.kind &&
+              canonicalPayload(record.payload) === record.canonical;
+          });
+          if (pendingRequests.length !== saved.requests.length) {
+            pendingStateNeedsReview = true;
+            storage.setItem(storageKey + "-review-required", "1");
+            status.textContent = "Some saved retry details could not be validated. Retry protection may be incomplete; contact AdenTech if a previous submission may have been delivered.";
+          }
+          pendingRequests.sort(function(a,b){return a.createdAt-b.createdAt;});
+          const mostRecent = pendingRequests[pendingRequests.length - 1];
+          if (mostRecent && isFormBlank(form)) {
+            restorePayload(form, mostRecent.payload);
+            status.textContent = "Your unfinished request was restored. Submit these unchanged answers to retry with the same reference.";
+          } else if (mostRecent && canonicalPayload(payloadFor(form)) !== mostRecent.canonical) {
+            status.textContent = "A different request is in progress. Submitting changed answers will create a new reference; earlier pending requests remain saved.";
+          }
+        } else if (saved) {
+          storage.removeItem(storageKey);
+          pendingStateNeedsReview = true;
+          storage.setItem(storageKey + "-review-required", "1");
+          status.textContent = "An older saved request could not be restored safely. Contact AdenTech before resubmitting if delivery may have occurred.";
+        }
+        if (pendingStateNeedsReview) status.textContent = "Saved request state could not be fully verified. Contact AdenTech before submitting again to avoid a possible duplicate.";
+      } catch (storageError) {
+        storageAvailable = false;
+        storage = null;
+        status.textContent = "Saved retry details could not be read. Retry protection across a reload cannot be guaranteed.";
+      }
+      if (storage) {
+        try {
+          const probe = storageKey + "-probe";
+          storage.setItem(probe, "1");
+          storage.removeItem(probe);
+        } catch (storageError) {
+          storageAvailable = false;
+          storage = null;
+          status.textContent = "This tab can read pending retry details but cannot save updates. Retry protection across a reload cannot be guaranteed.";
+        }
+      }
+    } else {
+      status.textContent = "This tab cannot save retry details. If delivery is uncertain, retry protection cannot be guaranteed.";
+    }
+
     form.addEventListener("submit", async function(event){
       event.preventDefault();
-      const status = form.querySelector(".at-form-status");
       const button = form.querySelector('button[type="submit"]');
+      if (pendingStateNeedsReview) {
+        status.textContent = "A previous saved request could not be verified. Contact AdenTech before submitting again to avoid a possible duplicate.";
+        return;
+      }
       if (!FORM_ENDPOINT || FORM_ENDPOINT.indexOf("PASTE_") === 0) {
         status.textContent = "Our online form is being connected. Please contact us through our Fiverr service page for now.";
         return;
       }
-      const payload = Object.fromEntries(new FormData(form).entries());
-      payload.kind = form.dataset.kind;
-      // Keep the public form simple; collect exact address and other details by email.
-      if (payload.kind === "quote") {
-        payload.fullAddress = "Service address to be confirmed, " + String(payload.location || "").trim();
-        payload.deviceQuantity = "";
-        payload.jobType = "Installation / setup";
-      }
-      payload.page = window.location.href;
+      const payload = payloadFor(form);
       if (payload.kind === "quote") {
         const bad = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
-        const postcode = /^(GIR\s?0AA|(?:[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}))$/i;
         const required = [
           ["name", "Enter your real name."],
           ["email", "Enter a valid email address."],
-          ["location", "Enter a UK postcode in the town/postcode field."],
+          ["location", "Enter a town or UK postcode."],
           ["equipment", "Tell us what equipment needs work."],
           ["details", "Describe the actual work required in at least 20 characters."]
         ];
@@ -222,20 +319,6 @@ body{background:#eaf0f7;padding:24px 12px}
             form.elements[item[0]]?.focus();
             return;
           }
-        }
-        if (!postcode.test(String(payload.location).trim())) {
-          status.textContent = "Please enter a valid UK postcode (for example, NW8 6DN).";
-          form.elements.location.focus(); return;
-        }
-        const address = String(payload.fullAddress).trim();
-        if (address.length < 10 || !/\d/.test(address) && !/\b(flat|apartment|unit|floor|house|building)\b/i.test(address)) {
-          status.textContent = "Add a street number/name or building and a postcode so we can check the address.";
-          form.elements.fullAddress.focus(); return;
-        }
-        const addrPostcode = address.match(/(?:GIR\s?0AA|[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2})/i);
-        if (!addrPostcode || addrPostcode[0].replace(/\s/g,"").toUpperCase() !== String(payload.location).replace(/\s/g,"").toUpperCase()) {
-          status.textContent = "The full address must include the same UK postcode entered above.";
-          form.elements.fullAddress.focus(); return;
         }
         if (String(payload.equipment).trim().length < 3 || bad.test(String(payload.equipment).trim())) {
           status.textContent = "Enter the real equipment type, such as laptop, desktop or monitor.";
@@ -249,9 +332,36 @@ body{background:#eaf0f7;padding:24px 12px}
           status.textContent = "Enter your real name rather than a test value.";
           form.elements.name.focus(); return;
         }
+        if (payload.existingReference && !/^[A-F0-9]{8,16}$/i.test(payload.existingReference)) {
+          status.textContent = "Enter the AdenTech reference shown in your earlier message, or leave this optional field blank.";
+          form.elements.existingReference.focus(); return;
+        }
+      }
+      if (!window.crypto || typeof window.crypto.getRandomValues !== "function") {
+        status.textContent = "This browser cannot create a secure request reference. Please try a current browser over HTTPS.";
+        return;
+      }
+      const canonical = canonicalPayload(payload);
+      const matchingIndex = pendingRequests.findIndex(function(record){return record.canonical === canonical;});
+      if (matchingIndex < 0 && pendingRequests.length >= MAX_PENDING_REQUESTS) {
+        status.textContent = "Several requests are still awaiting confirmation. Contact AdenTech before submitting another so none of their retry references are lost.";
+        return;
+      }
+      const matchingRecord = matchingIndex >= 0 ? pendingRequests[matchingIndex] : null;
+      const requestId = matchingRecord ? matchingRecord.requestId : getSecureUuid();
+      if (!requestId || !UUID_V4.test(requestId)) {
+        status.textContent = "A secure request reference could not be created. Please try again in a current browser over HTTPS.";
+        return;
+      }
+      const pendingRecord = matchingRecord || {requestId:requestId, payload:payload, canonical:canonical, createdAt:Date.now()};
+      if (!matchingRecord) pendingRequests.push(pendingRecord);
+      payload.requestId = requestId;
+      if (storageAvailable) {
+        try { storage.setItem(storageKey, JSON.stringify({version:STORAGE_VERSION, kind:payload.kind, requests:pendingRequests})); }
+        catch (storageError) { storageAvailable = false; storage = null; }
       }
       button.disabled = true;
-      status.textContent = "Sending your request…";
+      status.textContent = storageAvailable ? "Sending your request…" : "Retry protection cannot be guaranteed because this browser could not save the request. Sending with an in-page reference…";
       try {
         const response = await fetch(FORM_ENDPOINT, {
           method: "POST",
@@ -260,11 +370,35 @@ body{background:#eaf0f7;padding:24px 12px}
           body: JSON.stringify(payload)
         });
         const result = await response.json();
-        if (!response.ok || !result.ok) throw new Error("Request was not accepted");
+        if (!response.ok || !result.ok) {
+          if (response.ok && result.retryable !== true) {
+            status.textContent = result.message || "Please review the form and try again.";
+            return;
+          }
+          throw new Error("Request result could not be confirmed");
+        }
+        let localWarning = "";
+        pendingRequests = pendingRequests.filter(function(record){return record.requestId !== requestId;});
+        if (!storageAvailable && pendingRequests.length) localWarning = " Browser storage is unavailable; other pending requests are protected only in this tab.";
+        if (storage) {
+          try {
+            const saved = JSON.parse(storage.getItem(storageKey) || "null");
+            if (saved && saved.version === STORAGE_VERSION && saved.kind === payload.kind) {
+              if (pendingRequests.length) storage.setItem(storageKey, JSON.stringify({version:STORAGE_VERSION, kind:payload.kind, requests:pendingRequests}));
+              else storage.removeItem(storageKey);
+            }
+          } catch (storageError) {
+            storageAvailable = false;
+            localWarning = " The browser could not clear its saved retry details; contact AdenTech before retrying a restored request.";
+          }
+        }
         form.reset();
-        status.textContent = "Thanks — your request has been submitted. We’ll reply by email.";
+        status.textContent = result.message || ("Thanks — your request has been received for review. Reference: " + result.reference + ". We’ll reply by email.") +
+          localWarning;
       } catch (error) {
-        status.textContent = "We couldn’t confirm delivery. Please contact us through our Fiverr service page.";
+        status.textContent = storageAvailable
+          ? "We couldn’t confirm delivery. Your request is saved in this tab. Reloading will restore the same answers and reference; submit unchanged to retry. Changing an answer creates a new request."
+          : "We couldn’t confirm delivery. Retry protection cannot be guaranteed after this tab closes because browser storage failed. This page can reuse its in-memory reference if you retry unchanged.";
       } finally {
         button.disabled = false;
       }
