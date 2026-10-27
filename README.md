@@ -19,6 +19,7 @@ The site directs customers to **Get a quote**. It does not publish a price list 
 - The owner receives a request notification. New quote requests create an owner-only quote draft; an existing quote reference is routed for owner review and does not create another quote draft.
 - If processing becomes uncertain, the request is retained for review. `getPendingIntakeReviews()` lists persisted review cases. `recoverPendingIntakeReviews()` can send pending owner alerts without replaying customer messages. `setupIntakeRecoveryTrigger()` installs an optional hourly recovery trigger when deliberately run by the owner.
 - `apps-script/GmailFollowUpBot.gs` is a separate Gmail-bound script. It creates marked drafts only for AdenTech quote conversations; it does not send email or place orders. `setupAdenTechAutomation()` creates Gmail labels and a 15-minute trigger, so run it only after explicit owner approval.
+- `apps-script/TicketMonitor.gs` is an optional Gmail-to-Sheets ticket monitor. It reads the existing quote/enquiry labels, updates one ticket row per reference, and alerts the owner about verified customer replies. It does not send customer replies, quotes, prices or booking confirmations. Review [ticket monitor setup](apps-script/TICKET_MONITOR_SETUP.md) before configuring it.
 
 Internal labour estimate rules are £50 for the first billable hour and £20 for each additional billable hour. Add £0.45 per verified round-trip mile from NW8. Do not estimate travel before checking the exact address and route; confirm parts separately. AdenTech is not VAT registered, so do not add VAT. These rules are for owner review and are not displayed as public prices.
 
@@ -36,6 +37,8 @@ Run the local Apps Script stubs with Node.js:
 ```sh
 node apps-script/Code.test.js
 node apps-script/GmailFollowUpBot.test.js
+node --test apps-script/TicketMonitor.test.js
+node --check < apps-script/TicketMonitor.gs
 ```
 
 These tests do not connect to Google, access Gmail, deploy Apps Script or send real messages. See [DEPLOYMENT.md](DEPLOYMENT.md) for release and rollback steps.
