@@ -12,9 +12,12 @@ Do not add a public endpoint or a paid service. The worker uses standard
 installable time trigger. It must be added to the same Apps Script project as
 `apps-script/Code.gs` so it can see the labels created by website intake.
 
-1. In Google Sheets, create a new spreadsheet or select a spreadsheet the
-   owner has approved for customer ticket data. Copy its spreadsheet ID from
-   the URL. Do not put the ID or customer data in Git.
+1. In Google Sheets, create a new, private spreadsheet for customer ticket
+   data, or use an owner-approved spreadsheet with no existing `Tickets` or
+   `Ticket Reviews` tab. If either tab already exists, its header row must
+   exactly match this version's documented columns or the monitor stops for
+   owner review. Copy the spreadsheet ID from the URL. Do not put the ID or
+   customer data in Git.
 2. In the owner-controlled Apps Script project, add `TicketMonitor.gs` and
    save. Do not run it against a live account during initial review.
 3. Open **Project Settings → Script properties** and add:

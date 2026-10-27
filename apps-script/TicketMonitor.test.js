@@ -268,6 +268,8 @@ test("missing configuration and invalid monitor start fail closed", () => {
   assert.throws(() => invalidStart.context.processAdenTechTickets(), /start-time state is invalid/);
   const invalidOwner = harness({owner:"not-an-email"});
   assert.throws(() => invalidOwner.context.processAdenTechTickets(), /ADENTECH_TICKET_OWNER_EMAIL/);
+  const wrongSheetHeader = harness({existingRows:[["Unrelated data"]]});
+  assert.throws(() => wrongSheetHeader.context.processAdenTechTickets(), /unexpected columns/);
 });
 
 test("unrecognized owner notification source is queued instead of creating a ticket", () => {

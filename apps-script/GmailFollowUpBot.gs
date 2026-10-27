@@ -171,7 +171,6 @@ function draftQuoteAfterCustomerReply_() {
     const latestReply = incomingReplies[incomingReplies.length - 1];
     const replyText = latestReply.getPlainBody().slice(0, 12000);
     const latestSender = extractEmail_(latestReply.getFrom()).toLowerCase();
-    if (request.customerEmail && latestSender !== request.customerEmail.toLowerCase()) return;
     // A missing intake email does not make an arbitrary sender an identified
     // customer. Fail closed instead of drafting customer details to that address.
     if (!request.customerEmail || latestSender !== request.customerEmail.toLowerCase()) return;

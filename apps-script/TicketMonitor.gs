@@ -45,7 +45,7 @@ function processAdenTechTickets() {
         results.failures++;
       }
     });
-    if (results.failures) console.error("AdenTech ticket monitor had " + results.failures + " thread failures; inspect execution logs and the review tab.");
+    if (results.failures) console.error("AdenTech ticket monitor had " + results.failures + " thread failures; check execution history. The next poll will retry.");
     return results;
   } finally {
     lock.releaseLock();
