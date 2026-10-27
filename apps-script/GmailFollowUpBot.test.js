@@ -55,7 +55,7 @@ function harness({newQuoteThreads = [], replyThreads = [], labelFailure = null} 
     LockService:{getScriptLock:() => ({tryLock:() => {lockStats.acquired++; return true;}, releaseLock:() => {lockStats.released++;}})},
     ScriptApp:{getProjectTriggers:() => triggers.slice(), deleteTrigger:() => {deletedTriggers++;}, newTrigger:handler => ({timeBased:() => ({everyMinutes:minutes => ({create:() => {const trigger={handler,minutes,getHandlerFunction:() => handler};triggers.push(trigger);return trigger;}})})})},
     GmailApp:{
-      search:(query) => {
+      search:(query,start = 0,max = 100) => {
         searches.push(query);
         if (query.indexOf("in:drafts") === 0) {
           const match = query.match(/subject:"([^"]+)"/);
@@ -65,11 +65,11 @@ function harness({newQuoteThreads = [], replyThreads = [], labelFailure = null} 
             getMessages:() => [message({subject:d.subject,body:d.body,from:OWNER,to:d.to,date:"2026-01-02T10:00:00Z"})]
           }));
         }
-        if (query.indexOf("in:inbox") >= 0) return replyThreads;
+        if (query.indexOf("in:inbox") >= 0) return replyThreads.slice(start,start+max);
         if (query.indexOf("label:") === 0) return newQuoteThreads.filter(thread => {
           const done = labels.get("adentech-follow-up-drafted");
           return !done || !done.threads.some(t => t.getId() === thread.getId());
-        });
+        }).slice(start,start+max);
         return [];
       },
       getUserLabelByName:name => labels.get(name) || null,

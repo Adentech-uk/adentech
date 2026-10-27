@@ -46,9 +46,9 @@ function harness({threads = [], owner = OWNER, spreadsheetId = "sheet-id", inter
     LockService:{getScriptLock:() => lock},
     Session:{getEffectiveUser:() => ({getEmail:() => OWNER})},
     SpreadsheetApp:{openById:id => {assert.equal(id,spreadsheetId); return {getSheetByName:name => sheets.get(name) || null, insertSheet:name => sheet(name)};}},
-    GmailApp:{search:(query) => {
-      if (query.indexOf("in:sent") === 0) {const marker = query.match(/subject:"([^"]+)"/)[1]; return sent.filter(x => x.subject.includes(marker)).map(x => ({getId:() => x.id}));}
-      if (query.indexOf("label:") === 0) return threads;
+    GmailApp:{search:(query, start = 0, max = 100) => {
+      if (query.indexOf("in:sent") === 0) {const marker = query.match(/subject:"([^"]+)"/)[1]; return sent.filter(x => x.subject.includes(marker)).map(x => ({getId:() => x.id})).slice(start, start + max);}
+      if (query.indexOf("label:") === 0) return threads.slice(start, start + max);
       return [];
     }, createDraft:(to, subject, body) => ({send:() => {
       if (failSend && !sendThenThrow) throw new Error("send failed before delivery");
@@ -78,6 +78,18 @@ test("new quote and enquiry requests create one correctly typed ticket row", () 
   assert.equal(rows[1][11], "thread-1");
   assert.equal(rows[1][12], "");
   assert.equal(rows[1][14], "owner-message");
+});
+
+test("ticket label pagination processes every thread across multiple pages", () => {
+  const threads = Array.from({length:205}, (_, index) => {
+    const reference = index.toString(16).toUpperCase().padStart(16, "0");
+    return makeThread({id:"page-thread-" + index, reference});
+  });
+  const h = harness({threads});
+  const result = h.context.processAdenTechTickets();
+  assert.equal(result.threads, 205);
+  assert.equal(result.created, 205);
+  assert.equal(h.sheets.get("Tickets").rows.length, 206);
 });
 
 test("known customer reply updates existing row, highlights it and sends one owner alert", () => {
