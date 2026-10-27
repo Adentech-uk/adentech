@@ -237,13 +237,13 @@ function doPost(e) {
           reviewStatePersisted = true;
           if (request && state.phases.manualReviewNotification === "pending") {
             try { sendManualReviewNotice_(state, request, properties, stateKey); } catch (noticeError) {
-              console.error("AdenTech owner review notice remains queued; reference=" + state.reference);
+              console.error("AdenTech owner review notice remains queued; inspect the owner review queue.");
             }
           }
         }
       } catch (stateError) {}
     }
-    console.error("AdenTech intake needs recovery; reference=" + (state ? state.reference : "unassigned"));
+    console.error("AdenTech intake needs recovery; inspect the owner review queue.");
     if (state && state.status === "manual_review" && reviewStatePersisted) {
       return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
         message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
@@ -524,7 +524,7 @@ function sendManualReviewNotice_(state, request, properties, stateKey) {
       saveState_(properties, stateKey, state);
       return;
     }
-    console.warn("AdenTech manual-review notice could not be safely confirmed; owner must review request reference=" + state.reference);
+    console.warn("AdenTech manual-review notice could not be safely confirmed; owner must inspect the review queue.");
     return;
   }
   const owner = Session.getEffectiveUser().getEmail();
@@ -649,7 +649,9 @@ function getPendingIntakeReviews() {
     }
   });
   reviews.sort(function(a,b){return (a.createdAt || 0) - (b.createdAt || 0);});
-  Logger.log("Pending AdenTech reviews: " + JSON.stringify(reviews));
+  // The returned array is intended for the owner; execution logs can be more
+  // broadly visible to script editors, so never log customer names or emails.
+  Logger.log("Pending AdenTech review count: " + reviews.length);
   return reviews;
 }
 

@@ -23,6 +23,7 @@ function message({subject, body, from, to, date}) {
 function quoteThread(reply = null, subject = "[AT-12345678-1234-4234-8234-123456789abc-OWNER] AdenTech quote request " + REFERENCE) {
   const first = message({subject, body:[
     "Reference: " + REFERENCE,
+    "Type: Quote request — owner approval required",
     "Name: Jane Example",
     "Email: " + CUSTOMER,
     "Town / postcode: NW2",
@@ -44,13 +45,15 @@ function harness({newQuoteThreads = [], replyThreads = [], labelFailure = null} 
   const drafts = [];
   const labels = new Map();
   const searches = [];
+  const triggers = [];
+  let deletedTriggers = 0;
   let failLabel = labelFailure;
   const lockStats = {acquired:0, released:0};
   const context = {
     Logger:{log:() => {}},
     Session:{getEffectiveUser:() => ({getEmail:() => OWNER})},
     LockService:{getScriptLock:() => ({tryLock:() => {lockStats.acquired++; return true;}, releaseLock:() => {lockStats.released++;}})},
-    ScriptApp:{getProjectTriggers:() => [], newTrigger:() => ({timeBased:() => ({everyMinutes:() => ({create:() => ({})})})})},
+    ScriptApp:{getProjectTriggers:() => triggers.slice(), deleteTrigger:() => {deletedTriggers++;}, newTrigger:handler => ({timeBased:() => ({everyMinutes:minutes => ({create:() => {const trigger={handler,minutes,getHandlerFunction:() => handler};triggers.push(trigger);return trigger;}})})})},
     GmailApp:{
       search:(query) => {
         searches.push(query);
@@ -62,7 +65,7 @@ function harness({newQuoteThreads = [], replyThreads = [], labelFailure = null} 
             getMessages:() => [message({subject:d.subject,body:d.body,from:OWNER,to:d.to,date:"2026-01-02T10:00:00Z"})]
           }));
         }
-        if (query.indexOf("in:inbox") === 0) return replyThreads;
+        if (query.indexOf("in:inbox") >= 0) return replyThreads;
         if (query.indexOf("label:") === 0) return newQuoteThreads.filter(thread => {
           const done = labels.get("adentech-follow-up-drafted");
           return !done || !done.threads.some(t => t.getId() === thread.getId());
@@ -87,7 +90,7 @@ function harness({newQuoteThreads = [], replyThreads = [], labelFailure = null} 
   };
   vm.createContext(context);
   vm.runInContext(source,context);
-  return {context,drafts,labels,searches,lockStats};
+  return {context,drafts,labels,searches,lockStats,triggers,getDeletedTriggers:() => deletedTriggers};
 }
 
 test("new AdenTech quote gets one follow-up question draft and unknown quantities stay questions", () => {
@@ -120,7 +123,17 @@ test("unrelated order and non-quote AdenTech threads cannot create drafts", () =
   const h=harness({newQuoteThreads:[arbitrary,adenTechEnquiry],replyThreads:[arbitrary,adenTechEnquiry]});
   h.context.processAdenTechInbox();
   assert.equal(h.drafts.length,0);
-  assert.equal(h.searches.some(query => query.indexOf("in:inbox") === 0),true);
+  assert.equal(h.searches.some(query => query.indexOf("in:inbox") >= 0 && query.indexOf("label:") === 0),true);
+});
+
+test("quote-like thread from a non-owner sender cannot qualify for a quote draft", () => {
+  const spoof=quoteThread(message({subject:"Re: AdenTech quote request " + REFERENCE,body:"Please send a price",from:CUSTOMER,date:"2026-01-02T10:00:00Z"}));
+  const messages=spoof.getMessages();
+  const first=messages[0];
+  spoof.getMessages=() => [message({subject:first.getSubject(),body:first.getPlainBody(),from:"attacker@example.test",date:"2026-01-01T10:00:00Z"}),messages[1]];
+  const h=harness({replyThreads:[spoof]});
+  h.context.draftQuoteAfterCustomerReply_();
+  assert.equal(h.drafts.length,0);
 });
 
 test("quote reply needs the identified customer as sender", () => {
@@ -128,6 +141,29 @@ test("quote reply needs the identified customer as sender", () => {
   const h=harness({replyThreads:[quoteThread(wrongSender)]});
   h.context.draftQuoteAfterCustomerReply_();
   assert.equal(h.drafts.length,0);
+});
+
+test("quote reply with no intake customer email cannot create a draft to an arbitrary sender", () => {
+  const reply=message({subject:"Re: AdenTech quote request " + REFERENCE,body:"Please send a price",from:CUSTOMER,date:"2026-01-02T10:00:00Z"});
+  const thread=quoteThread(reply);
+  const getMessages=thread.getMessages;
+  thread.getMessages=() => {
+    const messages=getMessages();
+    const original=messages[0];
+    messages[0]=message({subject:original.getSubject(),body:original.getPlainBody().replace("Email: " + CUSTOMER,""),from:OWNER,date:"2026-01-01T10:00:00Z"});
+    return messages;
+  };
+  const h=harness({replyThreads:[thread]});
+  h.context.draftQuoteAfterCustomerReply_();
+  assert.equal(h.drafts.length,0);
+});
+
+test("setup preserves an existing trigger and does not install a duplicate", () => {
+  const h=harness();
+  h.context.setupAdenTechAutomation();
+  h.context.setupAdenTechAutomation();
+  assert.equal(h.triggers.length,1);
+  assert.equal(h.getDeletedTriggers(),0);
 });
 
 test("verified quote conversation gets a marked owner-review draft only once", () => {
