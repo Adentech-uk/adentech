@@ -1,44 +1,41 @@
 # AdenTech
 
-Website for AdenTech, independent home and small office IT setup.
+AdenTech helps home users, remote workers and small teams set up computers and workstations. The website is a static, single-page site in `index.html` and is intended for GitHub Pages.
 
-## Website
+## Services
 
-- `index.html` is the single-page site; no build step is needed.
-- Hosted with GitHub Pages.
-- Fiverr remains available at [fiverr.com/mahad209](https://www.fiverr.com/mahad209).
+- Desktop and laptop setup
+- Monitor, dock and peripheral setup
+- Printer installation and connection
+- Workstation setup, testing and handover
+- Agreed equipment moves between desks
 
-## Quote and enquiry automation
+The site directs customers to **Get a quote**. It does not publish a price list or claim a service area. Do not send passwords or sensitive account information through the form.
 
-The site has two separate forms:
-- **Get a Quote** — captures contact details, location, equipment, requested work and preferred timing.
-- **General Enquiry** — captures contact details, subject and message.
+## Quote and enquiry handling
 
-The forms are not live until the Google Apps Script endpoint is deployed and added to `FORM_ENDPOINT` in `index.html`.
+- `apps-script/Code.gs` validates submissions, applies rolling rate limits, stores request state and prevents duplicate processing by request ID.
+- Customers receive a receipt/reference acknowledgement only. They never receive an automatically generated quote or price.
+- The owner receives a request notification. New quote requests create an owner-only quote draft; an existing quote reference is routed for owner review and does not create another quote draft.
+- If processing becomes uncertain, the request is retained for review. `getPendingIntakeReviews()` lists persisted review cases. `recoverPendingIntakeReviews()` can send pending owner alerts without replaying customer messages. `setupIntakeRecoveryTrigger()` installs an optional hourly recovery trigger when deliberately run by the owner.
+- `apps-script/GmailFollowUpBot.gs` is a separate Gmail-bound script. It creates marked drafts only for AdenTech quote conversations; it does not send email or place orders. `setupAdenTechAutomation()` creates Gmail labels and a 15-minute trigger, so run it only after explicit owner approval.
 
-### Connect the forms to Gmail
+Internal labour estimate rules are £50 for the first billable hour and £20 for each additional billable hour. Add £0.45 per verified round-trip mile from NW8. Do not estimate travel before checking the exact address and route; confirm parts separately. AdenTech is not VAT registered, so do not add VAT. These rules are for owner review and are not displayed as public prices.
 
-1. Sign into the Google account that should receive website leads, then open [Google Apps Script](https://script.google.com/).
-2. Create a project and copy `apps-script/Code.gs` into its `Code.gs` editor.
-3. Select **Deploy → New deployment → Web app**.
-4. Set **Execute as** to **Me** and access to **Anyone** so website visitors can submit the form. Review the permissions, then authorize Gmail access.
-5. Deploy and copy the web app URL ending in `/exec`.
-6. In `index.html`, replace `PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE` in `FORM_ENDPOINT` with that URL, then commit the file.
-7. Test both forms from the published site. Confirm the owner receives the notification and the test customer email receives an acknowledgement.
+## Configuration to confirm
 
-### Current bot rules
+- `index.html` currently contains an Apps Script `/exec` endpoint. Confirm in the owner's Google account that it is the intended web app before relying on it; replace it only with the exact URL supplied by the owner.
+- The web app runs as the Google account selected at deployment. The owner notification recipient is taken from that account at runtime; there is no hard-coded owner email.
+- No service area is configured. Do not add local coverage or service-area promises until the owner supplies the exact towns/postcodes.
+- The repository does not contain the Apps Script project ID, Gmail account configuration or credentials. Keep those in the owner's Google account, never in this repository.
 
-- Creates/reuses Gmail labels `AdenTech/Quotes` and `AdenTech/Enquiries`.
-- Sends a lead notification to the Google account used to deploy the script and labels that notification.
-- **Quote requests:** sends a receipt acknowledgement and creates a customer-reply draft for the owner to review. It never invents or sends a price automatically.
-- **General enquiries:** auto-answers only a narrow, clear question about the types of services offered. Questions about prices, service area, availability, technical compatibility, urgent issues and anything uncertain are escalated for owner review.
-- Uses the submitter's email as the reply-to address on the owner notification.
+## Tests
 
-### Still required before going live
+Run the local Apps Script stubs with Node.js:
 
-- Replace the form endpoint placeholder in `index.html` with the deployed Apps Script `/exec` URL.
-- Set the exact towns/postcodes served in `SERVICE_AREA` in `apps-script/Code.gs` before adding any service-area auto-replies. Do not claim local coverage until this is configured.
-- Submit test quote and enquiry forms and verify the labels, notification emails, acknowledgement emails and quote draft.
-- Before allowing any customer-facing automatic quote, define written rules for labour rates, minimum charge, travel, parts, VAT/tax if applicable, remote vs on-site jobs, cancellations, and jobs that must always be manually reviewed. Keep owner approval enabled until the rules are tested.
+```sh
+node apps-script/Code.test.js
+node apps-script/GmailFollowUpBot.test.js
+```
 
-Never let the bot invent prices or promise work outside the agreed scope. Avoid collecting passwords or other sensitive account details.
+These tests do not connect to Google, access Gmail, deploy Apps Script or send real messages. See [DEPLOYMENT.md](DEPLOYMENT.md) for release and rollback steps.
