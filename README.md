@@ -1,41 +1,62 @@
 # AdenTech
 
-AdenTech helps home users, remote workers and small teams set up computers and workstations. The website is a static, single-page site in `index.html` and is intended for GitHub Pages.
+AdenTech provides computer and laptop setup, monitor and printer setup, and workstation setup/testing. The customer website is a static page in `index.html`; its forms use a separately deployed Google Apps Script web app.
 
-## Services
+The site uses **Get a quote** and does not display a public price list or claim a service area. The owner must confirm the local service area before coverage can be promised. Do not include passwords or sensitive account information in a form submission.
 
-- Desktop and laptop setup
-- Monitor, dock and peripheral setup
-- Printer installation and connection
-- Workstation setup, testing and handover
-- Agreed equipment moves between desks
+## Repository map
 
-The site directs customers to **Get a quote**. It does not publish a price list or claim a service area. Do not send passwords or sensitive account information through the form.
+- `index.html` — customer site and browser-side form handling.
+- `apps-script/Code.gs` — form intake, validation, duplicate/rate-limit handling, Gmail acknowledgement, owner notification and review-draft workflow.
+- `apps-script/GmailFollowUpBot.gs` — separate Gmail-bound follow-up workflow; creates owner-review drafts only.
+- `apps-script/Code.test.js` and `apps-script/GmailFollowUpBot.test.js` — local Node.js tests with mocked Google services and synthetic addresses.
+- `AGENTS.md` — permanent instructions for Codex and contributors.
+- `CODEX_EXECUTION_BRIEF.md` — detailed implementation and release requirements.
+- `DEPLOYMENT.md` — owner-operated publication, Apps Script update, safety and rollback instructions.
 
-## Quote and enquiry handling
+There is no package manifest or checked-in GitHub Actions workflow. The website has no build step. GitHub Pages settings and Apps Script project/deployment settings are managed outside this repository.
 
-- `apps-script/Code.gs` validates submissions, applies rolling rate limits, stores request state and prevents duplicate processing by request ID.
-- Customers receive a receipt/reference acknowledgement only. They never receive an automatically generated quote or price.
-- The owner receives a request notification. New quote requests create an owner-only quote draft; an existing quote reference is routed for owner review and does not create another quote draft.
-- If processing becomes uncertain, the request is retained for review. `getPendingIntakeReviews()` lists persisted review cases. `recoverPendingIntakeReviews()` can send pending owner alerts without replaying customer messages. `setupIntakeRecoveryTrigger()` installs an optional hourly recovery trigger when deliberately run by the owner.
-- `apps-script/GmailFollowUpBot.gs` is a separate Gmail-bound script. It creates marked drafts only for AdenTech quote conversations; it does not send email or place orders. `setupAdenTechAutomation()` creates Gmail labels and a 15-minute trigger, so run it only after explicit owner approval.
+## What automation does
 
-Internal labour estimate rules are £50 for the first billable hour and £20 for each additional billable hour. Add £0.45 per verified round-trip mile from NW8. Do not estimate travel before checking the exact address and route; confirm parts separately. AdenTech is not VAT registered, so do not add VAT. These rules are for owner review and are not displayed as public prices.
+- A quote request is validated and saved for duplicate-safe processing. The owner receives a notification and an owner-only quote draft. The customer receives a receipt/reference acknowledgement only.
+- Enquiries receive a receipt acknowledgement. Substantive questions and uncertain cases require an owner response.
+- The follow-up bot requires an AdenTech quote conversation and recognizable quote reference. It creates drafts for review and never sends customer messages or places orders.
+- Incomplete or uncertain work is retained for owner review. The optional recovery trigger and Gmail draft trigger are not installed by running tests.
+
+Internal estimates must use the owner's rules: the minimum visit charge includes the first billable hour, additional time is charged by the hour, travel uses only verified round-trip mileage from NW8, parts are confirmed separately, and VAT is not added. Do not calculate or publish a customer price until the owner confirms the scope and inputs.
 
 ## Configuration to confirm
 
-- `index.html` currently contains an Apps Script `/exec` endpoint. Confirm in the owner's Google account that it is the intended web app before relying on it; replace it only with the exact URL supplied by the owner.
-- The web app runs as the Google account selected at deployment. The owner notification recipient is taken from that account at runtime; there is no hard-coded owner email.
-- No service area is configured. Do not add local coverage or service-area promises until the owner supplies the exact towns/postcodes.
-- The repository does not contain the Apps Script project ID, Gmail account configuration or credentials. Keep those in the owner's Google account, never in this repository.
+Before relying on the live workflow, the owner must confirm:
 
-## Tests
+1. The exact local service area to serve. Until supplied and configured, coverage questions stay with the owner.
+2. The Google account that owns the web app and should receive owner notifications.
+3. That the existing Apps Script endpoint configured in `index.html` belongs to the intended owner-controlled deployment.
+4. Whether the Apps Script projects, deployment, Gmail labels, scopes and triggers already exist.
 
-Run the local Apps Script stubs with Node.js:
+Do not guess or commit endpoint URLs, account addresses, project IDs, credentials or service-area details. See [DEPLOYMENT.md](DEPLOYMENT.md) for release and rollback steps.
+
+## Run the local checks
+
+Install a supported Node.js release if Node is not already available, then run these commands from the repository root:
 
 ```sh
 node apps-script/Code.test.js
 node apps-script/GmailFollowUpBot.test.js
+node --check < apps-script/Code.gs
+node --check < apps-script/GmailFollowUpBot.gs
+node -e 'const fs=require("node:fs"); const vm=require("node:vm"); const h=fs.readFileSync("index.html","utf8"); const m=h.match(/<script>([\s\S]*?)<\/script>/); if(!m) throw Error("inline script missing"); new vm.Script(m[1]); console.log("inline JavaScript syntax OK")'
+git diff --check
 ```
 
-These tests do not connect to Google, access Gmail, deploy Apps Script or send real messages. See [DEPLOYMENT.md](DEPLOYMENT.md) for release and rollback steps.
+The tests use local stubs; they do not access Gmail, Apps Script, the configured form endpoint, customer accounts, or real email. Passing syntax/tests does not prove that a live form or deployment works. Do not run the Apps Script setup functions as a test.
+
+## Safe contribution workflow
+
+1. Read `AGENTS.md` and `CODEX_EXECUTION_BRIEF.md` before changing code.
+2. Inspect the current branch, working-tree status, latest `origin/main`, and relevant open pull requests. Preserve untracked or unexplained files.
+3. Make a focused change on a separate branch, update tests/docs, and run the relevant local checks.
+4. Review the full diff for secrets, customer data, unrelated files, broken links, accessibility and mobile layout.
+5. Open or update a reviewable pull request. Do not merge, deploy, authorize Google access, run live Gmail, create triggers, or send email without the owner's explicit approval.
+
+At handover, report the branch and PR, changed files, exact test results, configuration still needed, and whether anything was merged or deployed.
