@@ -30,8 +30,8 @@ const AT_LABELS = {
 
 const AT_PRICING = {
   basePostcode: "NW8",
-  firstHour: 50,
-  extraHour: 20,
+  minimumVisitCharge: 50,
+  hourlyRate: 20,
   roundTripMile: 0.45,
   vatRegistered: false
 };
@@ -57,8 +57,17 @@ function setupAdenTechAutomation() {
 }
 
 function processAdenTechInbox() {
-  draftFollowUpQuestionsForNewQuotes_();
-  draftQuoteAfterCustomerReply_();
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) {
+    Logger.log("AdenTech draft bot is already running; this run will be retried by the next trigger.");
+    return;
+  }
+  try {
+    draftFollowUpQuestionsForNewQuotes_();
+    draftQuoteAfterCustomerReply_();
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
@@ -73,16 +82,21 @@ function draftFollowUpQuestionsForNewQuotes_() {
   const threads = uniqueThreads_(queries);
 
   threads.forEach(function (thread) {
-    const details = extractRequestDetails_(thread);
-    if (!details.customerEmail || !isValidEmail_(details.customerEmail)) {
-      Logger.log("Skipping thread without a clear customer email: " + thread.getFirstMessageSubject());
-      done.addToThread(thread);
-      return;
-    }
+    try {
+      if (!isAdenTechQuoteConversation_(thread)) return;
+      const details = extractRequestDetails_(thread);
+      if (!details.customerEmail || !isValidEmail_(details.customerEmail)) {
+        Logger.log("AdenTech quote thread needs owner attention because no clear customer email was found: " + thread.getFirstMessageSubject());
+        return;
+      }
 
-    const subject = "AdenTech — a few questions about your request — " +
-      (details.reference || "reference to be confirmed");
-    const body = [
+      const marker = draftMarker_("FOLLOWUP", details.reference);
+      const subject = "[" + marker + "] AdenTech quote request " + details.reference + " — questions about your request";
+      if (findDraftByMarker_(marker)) {
+        done.addToThread(thread);
+        return;
+      }
+      const body = [
       "Hi " + (details.customerName || "there") + ",",
       "",
       "Thanks for contacting AdenTech" + (details.reference ? " (reference " + details.reference + ")" : "") + ".",
@@ -99,20 +113,24 @@ function draftFollowUpQuestionsForNewQuotes_() {
       "",
       "Please do not email passwords or other sensitive account information.",
       "",
-      "We will confirm the likely labour time, travel and any parts after reviewing your answers. Our pricing policy is £50 for the first hour, £20 for each additional hour, and £0.45 per round-trip mile from NW8 after the route is checked. Parts are separate if required. AdenTech is not VAT registered, so VAT is not added.",
+      "We will confirm the likely labour time, travel and any parts after reviewing your answers. For the owner's internal estimate, labour is £50 for the first billable hour and £20 for each additional billable hour. Verified round-trip mileage is £0.45 per mile from NW8. Parts are separate if required. AdenTech is not VAT registered, so VAT is not added.",
       "",
       "This is a request for information, not a confirmed booking or quote.",
       "",
       "Kind regards,",
       "AdenTech"
-    ].join("\n");
+      ].join("\n");
 
-    // Draft only: never send.
-    GmailApp.createDraft(details.customerEmail, subject, body, {
-      name: "AdenTech",
-      replyTo: Session.getEffectiveUser().getEmail()
-    });
-    done.addToThread(thread);
+      // The deterministic subject marker lets a later run find a draft created
+      // just before an interruption and avoid creating a second copy.
+      GmailApp.createDraft(details.customerEmail, subject, body, {
+        name: "AdenTech",
+        replyTo: Session.getEffectiveUser().getEmail()
+      });
+      done.addToThread(thread);
+    } catch (err) {
+      Logger.log("AdenTech follow-up draft was not fully processed; the next run will retry: " + err);
+    }
   });
 }
 
@@ -127,14 +145,14 @@ function draftQuoteAfterCustomerReply_() {
   const threads = GmailApp.search('in:inbox newer_than:180d subject:AdenTech -label:' + AT_LABELS.quoteDrafted, 0, 100);
 
   threads.forEach(function (thread) {
+    try {
     const messages = thread.getMessages();
     if (!messages || messages.length < 2) return;
 
     const request = extractRequestDetails_(thread);
     const firstBody = messages.length ? messages[0].getPlainBody() : "";
     const reference = request.reference || findReference_(thread.getFirstMessageSubject() + "\n" + firstBody);
-    // Scope processing to AdenTech-related subjects and references; do not treat arbitrary order IDs as quote requests.
-    if (!reference || !/adentech/i.test(thread.getFirstMessageSubject()) || !/(quote|request|follow[- ]?up)/i.test(thread.getFirstMessageSubject())) return;
+    if (!isAdenTechQuoteConversation_(thread) || !reference) return;
 
     const incomingReplies = messages.filter(function (message) {
       const from = extractEmail_(message.getFrom()).toLowerCase();
@@ -145,10 +163,18 @@ function draftQuoteAfterCustomerReply_() {
     // Only treat it as a quote reply if this thread contains a known AdenTech quote reference.
     const latestReply = incomingReplies[incomingReplies.length - 1];
     const replyText = latestReply.getPlainBody().slice(0, 12000);
-    const recipient = request.customerEmail || extractEmail_(latestReply.getFrom());
+    const latestSender = extractEmail_(latestReply.getFrom()).toLowerCase();
+    if (request.customerEmail && latestSender !== request.customerEmail.toLowerCase()) return;
+    const recipient = request.customerEmail || latestSender;
     if (!recipient || !isValidEmail_(recipient)) return;
 
-    const subject = "DRAFT QUOTE — " + reference + " — " + (request.customerName || recipient);
+    const marker = draftMarker_("QUOTE", reference);
+    if (findDraftByMarker_(marker)) {
+      quoteDrafted.addToThread(thread);
+      replySeen.addToThread(thread);
+      return;
+    }
+    const subject = "[" + marker + "] AdenTech quote request " + reference + " — DRAFT for " + (request.customerName || recipient);
     const draftBody = [
       "Hi " + (request.customerName || "there") + ",",
       "",
@@ -171,8 +197,9 @@ function draftQuoteAfterCustomerReply_() {
       "",
       "QUOTE WORKSHEET — DO NOT PRESENT AS A FINAL PRICE UNTIL COMPLETED",
       "Labour hours: NOT CONFIRMED — establish expected duration from the agreed scope.",
-      "Labour price: £" + AT_PRICING.firstHour.toFixed(2) + " for the first hour; £" +
-        AT_PRICING.extraHour.toFixed(2) + " per additional hour. Calculate only after duration is agreed.",
+      "Labour price: enter confirmed billable hours, then estimate £" + AT_PRICING.minimumVisitCharge.toFixed(2) +
+        " for the first hour plus £" + AT_PRICING.hourlyRate.toFixed(2) + " per additional billable hour. " +
+        "Do not estimate until duration is agreed.",
       "Travel: NOT CALCULATED — check the exact address and route from " + AT_PRICING.basePostcode +
         ", then calculate round-trip miles × £" + AT_PRICING.roundTripMile.toFixed(2) + ".",
       "Parts / cables / licences: NOT CONFIRMED — list and price only after checking with customer.",
@@ -188,7 +215,39 @@ function draftQuoteAfterCustomerReply_() {
     GmailApp.createDraft(recipient, subject, draftBody, { name: "AdenTech" });
     quoteDrafted.addToThread(thread);
     replySeen.addToThread(thread);
+    } catch (err) {
+      Logger.log("AdenTech quote draft was not fully processed; the next run will retry: " + err);
+    }
   });
+}
+
+function isAdenTechQuoteConversation_(thread) {
+  const messages = thread.getMessages();
+  const firstBody = messages && messages.length ? messages[0].getPlainBody() : "";
+  const firstSubject = thread.getFirstMessageSubject() || "";
+  return /adentech/i.test(firstSubject) && /quote/i.test(firstSubject) &&
+    !!findReference_(firstSubject + "\n" + firstBody);
+}
+
+function draftMarker_(kind, reference) {
+  return "AT-" + kind + "-" + String(reference || "").toUpperCase();
+}
+
+function findDraftByMarker_(marker) {
+  const threads = GmailApp.search('in:drafts subject:"' + marker + '"', 0, 51);
+  if (threads.length > 50) return true; // Fail closed: do not create a duplicate on an uncertain search.
+  return threads.some(function(thread) {
+    return thread.getMessages().some(function(message) {
+      return (message.getSubject() || "").indexOf(marker) >= 0;
+    });
+  });
+}
+
+function labourEstimateForHours_(hours) {
+  const value = Number(hours);
+  if (!isFinite(value) || value <= 0) return null;
+  const billableHours = Math.ceil(value);
+  return AT_PRICING.minimumVisitCharge + Math.max(0, billableHours - 1) * AT_PRICING.hourlyRate;
 }
 
 function extractRequestDetails_(thread) {
@@ -218,10 +277,9 @@ function extractMessage_(body) {
 function findReference_(text) {
   const value = String(text || "");
   const patterns = [
-    /Reference:\s*([A-Z0-9]{6,16})/i,
-    /AdenTech\s+(?:Quote|Enquiry)\s+([A-Z0-9]{6,16})/i,
-    /\b(?:quote|reference|ref|order)\s*#?\s*([A-Z0-9]{6,16})\b/i,
-    /\[AdenTech\s+(?:Quote|Enquiry)\s+([A-Z0-9]{6,16})\]/i
+    /Reference:\s*([A-F0-9]{8,16})\b/i,
+    /AdenTech\s+quote(?:\s+request)?\s+([A-F0-9]{8,16})\b/i,
+    /\[AdenTech\s+quote\s+([A-F0-9]{8,16})\]/i
   ];
   for (let i = 0; i < patterns.length; i++) {
     const match = value.match(patterns[i]);

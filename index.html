@@ -56,7 +56,7 @@ body{background:#eaf0f7;padding:24px 12px}
       <h1>Home and Small Office IT Setup, Made Simple.</h1>
       <p style="font-size:18px;color:#dce9f8;margin:0 0 20px;">Practical help setting up computers, monitors, printers and workstations — with clear communication and the work agreed in advance.</p>
       <div style="margin-bottom:20px;"><span class="at-pill">One-off projects</span><span class="at-pill">Weekend availability</span><span class="at-pill">Setup and testing</span></div>
-      <a class="at-btn" href="#contact">Get a Quote or Enquire ↓</a>
+      <a class="at-btn" href="#contact">Get a quote ↓</a>
     </div>
     <div class="at-hero-art" style="background:#0d315d;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:22px;">
       <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Illustration of a tested computer workstation" style="display:block;">
@@ -130,21 +130,11 @@ body{background:#eaf0f7;padding:24px 12px}
   <div class="at-wrap">
     <div style="text-align:center;max-width:720px;margin:0 auto 28px;">
       <h2>How Can We Help?</h2>
-      <p class="at-muted" style="margin:0;">Choose a quote request for a setup job, or send a general enquiry. Review the pricing policy below; we’ll confirm the job scope, estimated duration and travel before any work or cost is agreed.</p>
-    </div>
-    <div style="max-width:820px;margin:0 auto 26px;background:#fff;border:1px solid #dce6f2;border-radius:14px;padding:20px 22px;">
-      <h3 style="margin-bottom:8px;">How pricing works</h3>
-      <ul class="at-list" style="margin-top:6px;">
-        <li>Labour: £20 per hour, rounded up to full hours, with a £50 minimum charge.</li>
-        <li>Travel: £0.45 per round-trip mile from NW8, calculated after checking the route.</li>
-        <li>Parts and materials are additional and will be confirmed before purchase or work.</li>
-        <li>AdenTech is not VAT registered, so VAT is not added.</li>
-      </ul>
-      <p class="at-muted" style="font-size:13px;margin-bottom:0;">Any figure provided before the job and travel are reviewed is indicative only. No work or booking is confirmed until you approve the final scope and price.</p>
+      <p class="at-muted" style="margin:0;">Tell us what equipment needs setting up and what you would like done. We’ll review the scope and reply with any questions before confirming a quote. No work is booked until you approve it.</p>
     </div>
     <div class="at-grid at-contact-grid">
       <article class="at-card">
-        <div class="at-icon" aria-hidden="true">£</div>
+        <div class="at-icon" aria-hidden="true">✓</div>
         <h3>Get a Quote</h3>
         <p class="at-muted">Tell us about your equipment and what you need. We’ll review the request and reply to clarify details before providing a quote.</p>
         <form class="at-form" data-kind="quote">
@@ -155,7 +145,7 @@ body{background:#eaf0f7;padding:24px 12px}
           <label for="q-equipment" class="at-label">What equipment needs setting up?</label><input id="q-equipment" name="equipment" placeholder="e.g. one laptop and two monitors" required>
           <label for="q-details" class="at-label">What would you like help with?</label><textarea id="q-details" name="details" rows="4" placeholder="Briefly describe what you want connected or set up." required></textarea>
           <label for="q-timing" class="at-label">Preferred timing (optional)</label><input id="q-timing" name="timing" placeholder="e.g. weekend">
-          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Request a Quote</button>
+          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Get a quote</button>
           <p class="at-form-status" role="status" aria-live="polite"></p>
         </form>
       </article>
@@ -403,7 +393,7 @@ body{background:#eaf0f7;padding:24px 12px}
           }
         }
         form.reset();
-        status.textContent = "Thanks — your request has been received for review. Reference: " + result.reference + ". We’ll reply by email." +
+        status.textContent = result.message || ("Thanks — your request has been received for review. Reference: " + result.reference + ". We’ll reply by email.") +
           localWarning;
       } catch (error) {
         status.textContent = storageAvailable

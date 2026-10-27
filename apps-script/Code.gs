@@ -23,6 +23,7 @@ const MINIMUM_VISIT_CHARGE = 50;
 const MILEAGE_RATE = 0.45;
 const COMPLETED_RETENTION_DAYS = 30;
 const STATE_PREFIX = "AT_REQUEST_";
+const REVIEW_PREFIX = "AT_REVIEW_";
 const RATE_EMAIL_PREFIX = "AT_RATE_EMAIL_";
 const RATE_GLOBAL_KEY = "AT_RATE_GLOBAL";
 const RATE_WINDOW_MS = 60 * 60 * 1000;
@@ -38,60 +39,85 @@ function doPost(e) {
   let requestId = "";
   let stateKey = "";
   let state = null;
+  let request = null;
   let locked = false;
+  let reviewStatePersisted = false;
+  let completedPersisted = false;
   try {
-    // Apps Script web-app events do not expose a trusted client IP. Apply a
-    // server-wide rolling cap to every POST before parsing caller data, then a
-    // per-address cap after validation. Neither caller UUIDs nor browser code
-    // are used as abuse controls.
+    // Reject malformed submissions before they consume the shared valid-request
+    // budget or hold the global processing lock.
+    const raw = e && e.postData && e.postData.contents;
+    if (typeof raw !== "string" || raw.length > 20000) return output_({ok:false, retryable:false, message:"Please review the form fields and try again."});
+    let data;
+    try { data = JSON.parse(raw); }
+    catch (jsonError) { return output_({ok:false, retryable:false, message:"Please review the form fields and try again."}); }
+    if (!data || typeof data !== "object" || Array.isArray(data)) return output_({ok:false, retryable:false, message:"Please review the form fields and try again."});
+    requestId = typeof data.requestId === "string" ? data.requestId.trim().toLowerCase() : "";
+    if (!UUID_V4_PATTERN.test(requestId)) return output_({ok:false, retryable:false, message:"This request reference is missing or invalid. Please refresh and submit again."});
+    const validated = validateRequest_(data);
+    if (!validated.ok) return output_({ok:false, retryable:false, message:validated.message});
+    request = validated.request;
+    stateKey = STATE_PREFIX + requestId.replace(/-/g, "").toUpperCase();
+
+    // Apps Script does not expose a trusted client IP. This shared rolling cap
+    // applies to validated new work; per-address limits provide a second bound.
     const lock = LockService.getScriptLock();
     if (!lock.tryLock(10000)) return output_({ok:false, retryable:true, message:"The intake is busy. Please retry unchanged shortly."});
     locked = true;
     const properties = PropertiesService.getScriptProperties();
     pruneCompleted_(properties);
+    const payloadHash = digest_(JSON.stringify(request.payload));
+    const saved = properties.getProperty(stateKey);
+    if (saved) {
+      try {
+        state = JSON.parse(saved);
+        if (!state || typeof state !== "object" || Array.isArray(state) ||
+            typeof state.payloadHash !== "string" || !state.phases || typeof state.phases !== "object") {
+          throw new Error("Saved request state has an invalid shape");
+        }
+      } catch (corruptStateError) {
+        // Preserve the malformed source record. A separate stable review record
+        // keeps this request visible and prevents unsafe side effects on retry.
+        stateKey = REVIEW_PREFIX + requestId.replace(/-/g, "").toUpperCase();
+        const reviewSaved = properties.getProperty(stateKey);
+        state = reviewSaved ? JSON.parse(reviewSaved) : newReviewState_(request, payloadHash, "request_state_corrupt", stateKey);
+        if (!reviewSaved) saveState_(properties, stateKey, state);
+        reviewStatePersisted = true;
+        sendManualReviewNotice_(state, request, properties, stateKey);
+        return output_({ok:true, needsOwnerReview:true, reference:state.reference,
+          workflow:state.workflow, message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
+      }
+      if (state.payloadHash !== payloadHash) return output_({ok:false, message:"This request reference is already associated with different answers. Change the form to create a new reference."});
+      if (state.status === "completed") return output_({ok:true, reference:state.reference, workflow:state.workflow, duplicate:true});
+      if (state.status === "manual_review" && state.phases.manualReviewNotification === "done") {
+        return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
+          message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
+      }
+    }
+
     const globalRateLimit = consumeGlobalRateLimit_(properties);
     if (!globalRateLimit.ok) return output_({ok:false, retryable:true, retryAfterSeconds:globalRateLimit.retryAfterSeconds,
       message:"The intake is receiving requests too quickly. Please wait and retry unchanged."});
 
-    const raw = e && e.postData && e.postData.contents;
-    if (typeof raw !== "string" || raw.length > 20000) return output_({ok:false, message:"Please review the form fields and try again."});
-    const data = JSON.parse(raw);
-    if (!data || typeof data !== "object" || Array.isArray(data)) return output_({ok:false, message:"Please review the form fields and try again."});
-    requestId = typeof data.requestId === "string" ? data.requestId.trim().toLowerCase() : "";
-    if (!UUID_V4_PATTERN.test(requestId)) return output_({ok:false, message:"This request reference is missing or invalid. Please refresh and submit again."});
-
-    const validated = validateRequest_(data);
-    if (!validated.ok) return output_({ok:false, message:validated.message});
-    const request = validated.request;
-
-    stateKey = STATE_PREFIX + requestId.replace(/-/g, "").toUpperCase();
-    const payloadHash = digest_(JSON.stringify(request.payload));
-    const saved = properties.getProperty(stateKey);
-    if (saved) {
-      state = JSON.parse(saved);
-      if (state.payloadHash !== payloadHash) return output_({ok:false, message:"This request reference is already associated with different answers. Change the form to create a new reference."});
-      if (state.status === "completed") return output_({ok:true, reference:state.reference, workflow:state.workflow, duplicate:true});
-      if (state.status === "manual_review" && state.phases.manualReviewNotification === "done") {
-        return output_({ok:false, retryable:false, message:"Your request needs owner review. Please contact AdenTech and quote reference " + state.reference + "."});
-      }
-    }
-
-    const rateLimit = consumeEmailRateLimit_(properties, request.email);
-    if (!rateLimit.ok) return output_({ok:false, retryable:true, retryAfterSeconds:rateLimit.retryAfterSeconds,
-      message:"The intake is receiving requests too quickly. Please wait and retry unchanged."});
-
     if (!saved) {
-      state = newState_(requestId, payloadHash, request.kind);
+      const rateLimit = consumeEmailRateLimit_(properties, request.email);
+      if (!rateLimit.ok) return output_({ok:false, retryable:true, retryAfterSeconds:rateLimit.retryAfterSeconds,
+        message:"The intake is receiving requests too quickly. Please wait and retry unchanged."});
+      state = newState_(requestId, payloadHash, request.kind, request);
       properties.setProperty(stateKey, JSON.stringify(state));
+    } else {
+      state.reviewContext = state.reviewContext || reviewContext_(request);
     }
 
     if (!reconcileAttemptingPhases_(state, request, properties, stateKey)) {
       if (state.phases.manualReviewNotification === "pending" || state.phases.manualReviewNotification === "attempting") sendManualReviewNotice_(state, request, properties, stateKey);
-      return output_({ok:false, retryable:false, message:"We could not safely confirm the request status. AdenTech will review it manually; reference " + state.reference + "."});
+      return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
+        message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
     }
     if (state.status === "manual_review") {
       if (state.phases.manualReviewNotification === "pending" || state.phases.manualReviewNotification === "attempting") sendManualReviewNotice_(state, request, properties, stateKey);
-      return output_({ok:false, retryable:false, message:"Your request needs owner review. Please contact AdenTech and quote reference " + state.reference + "."});
+      return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
+        message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
     }
 
     if (request.kind === "quote" && !state.referenceResolutionComplete) {
@@ -176,29 +202,59 @@ function doPost(e) {
     }
 
     state.status = state.requiresManualReview ? "manual_review" : "completed";
-    if (!state.requiresManualReview) state.completedAt = Date.now();
+    if (!state.requiresManualReview) {
+      state.completedAt = Date.now();
+      delete state.reviewContext;
+    }
     else state.phases.manualReviewNotification = "done"; // The owner notification contains the review flag.
     saveState_(properties, stateKey, state);
+    completedPersisted = state.status === "completed";
+    if (state.requiresManualReview) {
+      return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
+        message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
+    }
     return output_({ok:true, reference:state.reference, workflow:state.workflow});
   } catch (err) {
     if (err && err.code === "RATE_LIMIT_STATE_CORRUPT") {
       console.error("AdenTech global rate-limit state is corrupt; explicit repair is required.");
       return output_({ok:false, retryable:false, message:"The online form is temporarily unavailable. Please contact AdenTech directly."});
     }
+    if (completedPersisted && state) {
+      return output_({ok:true, reference:state.reference, workflow:state.workflow, duplicate:true});
+    }
     if (state && stateKey) {
       try {
-        state.status = state.status === "manual_review" ? "manual_review" : "incomplete";
-        saveState_(PropertiesService.getScriptProperties(), stateKey, state);
+        if (state.status !== "completed") {
+          state.status = "manual_review";
+          state.reviewReason = state.reviewReason || "processing_interrupted";
+          state.workflow = state.workflow || "owner-review-required";
+          if (request) state.reviewContext = reviewContext_(request);
+          if (state.phases && state.phases.manualReviewNotification !== "done") {
+            state.phases.manualReviewNotification = state.phases.manualReviewNotification || "pending";
+          }
+          const properties = PropertiesService.getScriptProperties();
+          saveState_(properties, stateKey, state);
+          reviewStatePersisted = true;
+          if (request && state.phases.manualReviewNotification === "pending") {
+            try { sendManualReviewNotice_(state, request, properties, stateKey); } catch (noticeError) {
+              console.error("AdenTech owner review notice remains queued; reference=" + state.reference);
+            }
+          }
+        }
       } catch (stateError) {}
     }
     console.error("AdenTech intake needs recovery; reference=" + (state ? state.reference : "unassigned"));
+    if (state && state.status === "manual_review" && reviewStatePersisted) {
+      return output_({ok:true, needsOwnerReview:true, reference:state.reference, workflow:state.workflow,
+        message:"We received your request and flagged it for AdenTech to review. Reference: " + state.reference + "."});
+    }
     return output_({ok:false, retryable:true, message:"We could not confirm processing. Please retry unchanged shortly; if uncertainty continues, contact AdenTech."});
   } finally {
     if (locked) LockService.getScriptLock().releaseLock();
   }
 }
 
-function newState_(requestId, payloadHash, kind) {
+function newState_(requestId, payloadHash, kind, request) {
   return {
     requestId:requestId,
     payloadHash:payloadHash,
@@ -207,6 +263,7 @@ function newState_(requestId, payloadHash, kind) {
     updatedAt:Date.now(),
     reference:Utilities.getUuid().replace(/-/g, "").slice(0, 16).toUpperCase(),
     workflow:kind === "quote" ? "quote-awaiting-owner-approval" : "enquiry-awaiting-review",
+    reviewContext:reviewContext_(request),
     referenceResolutionComplete:kind !== "quote",
     phases:{
       ownerNotification:"pending",
@@ -217,6 +274,20 @@ function newState_(requestId, payloadHash, kind) {
       manualReviewNotification:"pending"
     }
   };
+}
+
+function reviewContext_(request) {
+  return {requestId:request.requestId, kind:request.kind, name:request.name, email:request.email,
+    location:request.payload.location || "", equipment:request.payload.equipment || "", message:request.message};
+}
+
+function newReviewState_(request, payloadHash, reason, stateKey) {
+  const state = newState_(request.requestId, payloadHash, request.kind, request);
+  state.status = "manual_review";
+  state.workflow = "owner-review-required";
+  state.reviewReason = reason;
+  state.sourceStateKey = stateKey;
+  return state;
 }
 
 function validateRequest_(data) {
@@ -360,6 +431,7 @@ function buildArtifacts_(request, state) {
     "Submitted locality: " + (p.location || "Not supplied") + " (" + (request.locationStatus || "not applicable") + ")",
     "Exact service address: not supplied or verified; confirm directly with customer.",
     "Equipment: " + (p.equipment || "Not supplied"),
+    "Device quantity: " + (p.deviceQuantity || "Not supplied; confirm with customer."),
     "Preferred timing: " + (p.timing || "Not supplied"),
     "Subject: " + (p.subject || "Not supplied"),
     "Message:", p.details,
@@ -374,7 +446,8 @@ function buildArtifacts_(request, state) {
     "Reference: " + state.reference,
     "Confirm exact service address, scope, and duration directly with the customer.",
     "Town/postcode is unverified and is not a service address.",
-    "Labour policy: £" + HOURLY_LABOUR_RATE + " per hour rounded up to full hours, with a £" + MINIMUM_VISIT_CHARGE + " minimum.",
+    "Device quantity: " + (p.deviceQuantity || "Not supplied; confirm with customer."),
+    "Labour estimate: owner must confirm billable hours. Internal rule: £" + MINIMUM_VISIT_CHARGE + " for the first billable hour, then £" + HOURLY_LABOUR_RATE + " per additional billable hour.",
     "Mileage: leave unpriced until the owner verifies the exact round-trip distance from " + BASE_POSTCODE + ". Rate: £" + MILEAGE_RATE.toFixed(2) + " per verified round-trip mile.",
     "Do not add VAT. Confirm parts/materials separately.",
     "", "Customer request for internal context:", p.details,
@@ -464,6 +537,7 @@ function sendManualReviewNotice_(state, request, properties, stateKey) {
     "Name: " + request.name,
     "Email: " + request.email,
     "Submitted locality (unverified): " + (request.payload.location || "Not supplied"),
+    "Equipment: " + (request.payload.equipment || "Not supplied"),
     "Message: " + request.message
   ].join("\n");
   GmailApp.sendEmail(owner, "[" + marker + "] AdenTech request needs manual review " + state.reference,
@@ -555,6 +629,90 @@ function globalRateLimitStateError_() {
   const err = new Error("Global rate-limit state is invalid; explicit repair is required.");
   err.code = "RATE_LIMIT_STATE_CORRUPT";
   return err;
+}
+
+/** Owner-run review queue: returns requests that need manual follow-up. */
+function getPendingIntakeReviews() {
+  const all = PropertiesService.getScriptProperties().getProperties();
+  const reviews = [];
+  Object.keys(all).forEach(function(key) {
+    if (key.indexOf(STATE_PREFIX) !== 0 && key.indexOf(REVIEW_PREFIX) !== 0) return;
+    try {
+      const state = JSON.parse(all[key]);
+      if (state.status !== "manual_review" && state.status !== "incomplete") return;
+      const context = state.reviewContext || {};
+      reviews.push({reference:state.reference, requestId:state.requestId, status:state.status,
+        reason:state.reviewReason || "owner_review_required", createdAt:state.createdAt,
+        name:context.name || "", email:context.email || ""});
+    } catch (err) {
+      reviews.push({reference:"unavailable", status:"manual_review", reason:"request_state_corrupt"});
+    }
+  });
+  reviews.sort(function(a,b){return (a.createdAt || 0) - (b.createdAt || 0);});
+  Logger.log("Pending AdenTech reviews: " + JSON.stringify(reviews));
+  return reviews;
+}
+
+/** Trigger target. It alerts on saved incomplete/review requests without
+ * replaying customer emails, drafts, or labels. Uncertain sends stay visible
+ * in getPendingIntakeReviews() and are never blindly resent. */
+function recoverPendingIntakeReviews() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return {ok:false, message:"Intake is busy; recovery will be retried."};
+  try {
+    const properties = PropertiesService.getScriptProperties();
+    const all = properties.getProperties();
+    let reviewed = 0;
+    let notified = 0;
+    let uncertain = 0;
+    Object.keys(all).forEach(function(key) {
+      if (key.indexOf(STATE_PREFIX) !== 0 && key.indexOf(REVIEW_PREFIX) !== 0) return;
+      let state;
+      try { state = JSON.parse(all[key]); } catch (err) { uncertain++; return; }
+      if (state.status !== "manual_review" && state.status !== "incomplete") return;
+      const context = state.reviewContext;
+      if (!context || !context.email || !context.requestId) { uncertain++; return; }
+      if (state.status === "incomplete") {
+        state.status = "manual_review";
+        state.reviewReason = state.reviewReason || "processing_interrupted";
+      }
+      const request = {requestId:context.requestId, kind:context.kind, name:context.name,
+        email:context.email, message:context.message,
+        payload:{location:context.location || "", equipment:context.equipment || ""}};
+      if (state.phases.manualReviewNotification === "pending") {
+        try {
+          sendManualReviewNotice_(state, request, properties, key);
+          if (state.phases.manualReviewNotification === "done") notified++;
+        } catch (noticeError) { uncertain++; }
+      } else if (state.phases.manualReviewNotification === "attempting") {
+        try {
+          const marker = "AT-" + context.requestId + "-REVIEW";
+          const found = findUniqueMarkedMessage_(marker, "in:sent");
+          if (found.status === "matched") {
+            state.phases.manualReviewNotification = "done";
+            saveState_(properties, key, state);
+            notified++;
+          } else {
+            uncertain++;
+          }
+        } catch (searchError) { uncertain++; }
+      }
+      saveState_(properties, key, state);
+      reviewed++;
+    });
+    return {ok:true, reviewed:reviewed, notified:notified, uncertain:uncertain};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Optional owner-run setup. This function is not invoked by doPost. */
+function setupIntakeRecoveryTrigger() {
+  const exists = ScriptApp.getProjectTriggers().some(function(trigger) {
+    return trigger.getHandlerFunction() === "recoverPendingIntakeReviews";
+  });
+  if (!exists) ScriptApp.newTrigger("recoverPendingIntakeReviews").timeBased().everyHours(1).create();
+  return {installed:!exists, handler:"recoverPendingIntakeReviews"};
 }
 
 function digest_(value) {

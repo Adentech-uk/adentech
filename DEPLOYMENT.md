@@ -1,28 +1,72 @@
-# AdenTech quote and enquiry automation
+# AdenTech release and rollback guide
 
-The website has two lead forms:
-- **Get a Quote** — captures contact details, location, equipment, work requested and preferred timing.
-- **General Enquiry** — captures contact details, subject and message.
+The website and Apps Script are separate systems. Updating GitHub Pages does not update Google Apps Script, and updating Apps Script does not publish the website. This guide describes owner-run release steps; no deployment, Gmail authorization, live form submission, or trigger creation has been performed as part of this code change.
 
-The automation script is in [apps-script/Code.gs](apps-script/Code.gs). It creates/reuses Gmail labels named **AdenTech/Quotes** and **AdenTech/Enquiries**, sends a lead summary to the Google account that deploys the script, and sends a receipt acknowledgement to the customer.
+## Before release: confirm the values owned by you
 
-## Setup required before forms can deliver
+1. Confirm which Google account should own the web app and receive owner notifications. The script uses the effective account at deployment; it does not contain an owner email address.
+2. Confirm that the `/exec` URL already configured as `FORM_ENDPOINT` in `index.html` is the intended web app. If it is not, supply and enter the exact URL from the owner-controlled Apps Script deployment. Do not guess or copy a test URL into the production site.
+3. No service area is set in this repository. Do not claim coverage or enable location-based replies until you provide exact towns/postcodes.
+4. Review the draft PR and run the local tests below. The automated tests use stubs and do not prove behavior in the owner's Google account.
 
-1. Sign into the Google account whose Gmail inbox should receive leads.
-2. Open [Google Apps Script](https://script.google.com/) and create a new project.
-3. Copy the contents of `apps-script/Code.gs` into `Code.gs`.
-4. Choose **Deploy → New deployment → Web app**.
-5. Set **Execute as** to **Me**. Set access to **Anyone** so visitors can submit the public website form. Review the Google permissions and deploy.
-6. Copy the web-app URL ending in `/exec`.
-7. In `index.html`, replace `PASTE_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE` in `FORM_ENDPOINT` with that URL, then commit the change.
-8. Test both forms and verify the notification appears in Gmail with the correct label and that the customer receives an acknowledgement.
+```sh
+node apps-script/Code.test.js
+node apps-script/GmailFollowUpBot.test.js
+node --check < apps-script/Code.gs
+node --check < apps-script/GmailFollowUpBot.gs
+```
 
-If Google Workspace policies block public web apps, use an approved form/backend service instead. Never put Google passwords, API keys, or private tokens in the website repository.
+## Publish the website with GitHub Pages
 
-## Quote policy
+There is no checked-in GitHub Actions Pages workflow. The expected setup is GitHub Pages deployed from the `main` branch root.
 
-The bot acknowledges quote requests and gathers the information needed to prepare a quote. It does **not** invent a price or promise availability. Review each request and send a confirmed quote after checking the work, travel/location, equipment, time required and any applicable minimum charge. Once AdenTech has an agreed pricing/rate card and approval rules, the workflow can be extended to prepare suggested quote replies for review.
+1. Review and merge the release PR when you approve it. Do not merge a draft PR before its review is complete.
+2. In the GitHub repository, open **Settings → Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**.
+4. Select branch **`main`** and folder **`/(root)`**, then select **Save**. If GitHub Pages is already configured differently, confirm the intended source before changing it.
+5. Wait for the Pages deployment shown in the repository's **Deployments** or **Actions** view to complete.
+6. Open the published site and check the first screen, service descriptions, mobile layout and form endpoint configuration. Do not submit a real customer form as a release smoke test: a live submission sends an owner notification and customer acknowledgement and may create a Gmail draft.
 
-## Important
+### Roll back GitHub Pages
 
-The forms are not live until the Apps Script is deployed and the URL is added to `index.html`. The site is static GitHub Pages, so it cannot create Gmail labels or send emails by itself.
+1. Find the merge commit for the bad website release in the repository history.
+2. Use GitHub's **Revert** action on the merged pull request, or create a branch and run `git revert <merge-commit-sha>`.
+3. Open and merge the revert PR. Do not force-push or reset `main`.
+4. Wait for the new Pages deployment, then confirm the previous website is live.
+
+## Update the Apps Script web app
+
+Use the existing owner-controlled Apps Script project and deployment if one exists. The project ID and live deployment URL are not stored here.
+
+1. Sign into the Google account confirmed above and open the existing Apps Script project for the website handler.
+2. Save a copy of the current `Code.gs` outside the project as a rollback copy.
+3. Replace the editor contents with `apps-script/Code.gs` and save.
+4. In **Deploy → Manage deployments**, edit the existing web app deployment. Select **New version**, keep **Execute as: Me** and the currently approved public access setting, then deploy the new version. Editing the existing deployment preserves its `/exec` URL.
+5. If no web app deployment exists, create one only after confirming the owner account and access policy. Set **Execute as: Me** and access to **Anyone** for a public website form. Copy the exact `/exec` URL shown by Apps Script into `FORM_ENDPOINT`; do not invent one.
+6. Use a separate test deployment and dummy contact details for end-to-end checks. The handler sends an owner notification and a customer receipt and can create an owner-only quote draft. Obtain explicit approval before using a live customer form or real Gmail account for testing.
+
+The customer email is a receipt/reference acknowledgement only. Quote drafts are owner-only. The intake recovery queue is stored in Script Properties; run `getPendingIntakeReviews()` in the owner project to inspect unresolved items. `recoverPendingIntakeReviews()` sends alerts for pending items and checks marked sent mail after interruption.
+
+### Roll back the Apps Script web app
+
+1. Open **Deploy → Manage deployments** in the same project.
+2. Edit the existing web app deployment and select the last known-good deployed version.
+3. Deploy that version and confirm the deployment still uses the intended `/exec` URL.
+4. If the old version is unavailable, restore the saved `Code.gs` copy, save it, and deploy it as a new version.
+
+## Gmail follow-up bot and recovery trigger
+
+`apps-script/GmailFollowUpBot.gs` belongs in a separate Gmail-bound Apps Script project. It creates drafts only and is restricted to AdenTech quote conversations with a recognized reference. The helper `setupAdenTechAutomation()` creates labels and a 15-minute trigger. Do not run it until the owner approves Gmail access and trigger creation.
+
+The intake recovery trigger is separate. `setupIntakeRecoveryTrigger()` creates one hourly trigger for `recoverPendingIntakeReviews()` and is idempotent. It has not been run. The owner can first inspect the queue manually, then decide whether to authorize this trigger.
+
+### Remove triggers during rollback
+
+In the relevant Apps Script project, open **Triggers** (clock icon), delete the trigger whose handler is `processAdenTechInbox` to stop the Gmail draft bot, or delete `recoverPendingIntakeReviews` to stop periodic intake recovery. Removing a trigger does not delete existing email or drafts. Do not run either setup function again unless the owner wants to reinstall that automation.
+
+## Safe operating rules
+
+- Never paste Google credentials, OAuth tokens, project IDs, or customer data into this repository.
+- Do not run Apps Script test setup against a production project.
+- Do not execute `setupAdenTechAutomation()` or `setupIntakeRecoveryTrigger()` without explicit approval for the resulting trigger and account access.
+- Never let automation send a quote, price or order. Review and send any customer-facing quote manually after confirming scope, billable duration, exact address, verified round-trip mileage and parts.
