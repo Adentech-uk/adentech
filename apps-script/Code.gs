@@ -201,6 +201,14 @@ function doPost(e) {
       saveState_(properties, stateKey, state);
     }
 
+    // Update the ticket sheet immediately for website submissions. This is
+    // best-effort; the existing Gmail monitor remains the recovery/import path.
+    try {
+      syncAdenTechTicketFromWebsite_(request, state);
+    } catch (ticketSyncError) {
+      console.error("AdenTech immediate ticket sync failed; Gmail monitor will retry the import for reference=" + state.reference);
+    }
+
     state.status = state.requiresManualReview ? "manual_review" : "completed";
     if (!state.requiresManualReview) {
       state.completedAt = Date.now();
