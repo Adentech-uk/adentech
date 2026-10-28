@@ -41,12 +41,15 @@ function setupAdenTechAutomation() {
     getOrCreateLabel_(AT_LABELS[key]);
   });
 
-  // Avoid duplicate triggers.
-  ScriptApp.getProjectTriggers().forEach(function (trigger) {
-    if (trigger.getHandlerFunction() === "processAdenTechInbox") {
-      ScriptApp.deleteTrigger(trigger);
-    }
+  // Preserve existing owner-configured trigger schedules and never delete a
+  // trigger as a side effect of setup.
+  const existingTrigger = ScriptApp.getProjectTriggers().some(function (trigger) {
+    return trigger.getHandlerFunction() === "processAdenTechInbox";
   });
+  if (existingTrigger) {
+    Logger.log("AdenTech draft bot trigger already exists; no trigger changes made.");
+    return {installed:false, alreadyInstalled:true};
+  }
 
   ScriptApp.newTrigger("processAdenTechInbox")
     .timeBased()
@@ -86,7 +89,7 @@ function draftFollowUpQuestionsForNewQuotes_() {
       if (!isAdenTechQuoteConversation_(thread)) return;
       const details = extractRequestDetails_(thread);
       if (!details.customerEmail || !isValidEmail_(details.customerEmail)) {
-        Logger.log("AdenTech quote thread needs owner attention because no clear customer email was found: " + thread.getFirstMessageSubject());
+        Logger.log("AdenTech quote thread needs owner attention because no clear customer email was found.");
         return;
       }
 
@@ -129,7 +132,7 @@ function draftFollowUpQuestionsForNewQuotes_() {
       });
       done.addToThread(thread);
     } catch (err) {
-      Logger.log("AdenTech follow-up draft was not fully processed; the next run will retry: " + err);
+      Logger.log("AdenTech follow-up draft was not fully processed; the next run will retry.");
     }
   });
 }
@@ -142,7 +145,11 @@ function draftQuoteAfterCustomerReply_() {
   const replySeen = getOrCreateLabel_(AT_LABELS.replySeen);
   const quoteDrafted = getOrCreateLabel_(AT_LABELS.quoteDrafted);
   const ownerEmail = String(Session.getEffectiveUser().getEmail() || "").toLowerCase();
-  const threads = GmailApp.search('in:inbox newer_than:180d subject:AdenTech -label:' + AT_LABELS.quoteDrafted, 0, 100);
+  const queries = [
+    'label:' + AT_LABELS.quote + ' in:inbox newer_than:180d -label:' + AT_LABELS.quoteDrafted,
+    'label:"AdenTech/Quotes" in:inbox newer_than:180d -label:' + AT_LABELS.quoteDrafted
+  ];
+  const threads = uniqueThreads_(queries);
 
   threads.forEach(function (thread) {
     try {
@@ -164,8 +171,10 @@ function draftQuoteAfterCustomerReply_() {
     const latestReply = incomingReplies[incomingReplies.length - 1];
     const replyText = latestReply.getPlainBody().slice(0, 12000);
     const latestSender = extractEmail_(latestReply.getFrom()).toLowerCase();
-    if (request.customerEmail && latestSender !== request.customerEmail.toLowerCase()) return;
-    const recipient = request.customerEmail || latestSender;
+    // A missing intake email does not make an arbitrary sender an identified
+    // customer. Fail closed instead of drafting customer details to that address.
+    if (!request.customerEmail || latestSender !== request.customerEmail.toLowerCase()) return;
+    const recipient = request.customerEmail;
     if (!recipient || !isValidEmail_(recipient)) return;
 
     const marker = draftMarker_("QUOTE", reference);
@@ -216,7 +225,7 @@ function draftQuoteAfterCustomerReply_() {
     quoteDrafted.addToThread(thread);
     replySeen.addToThread(thread);
     } catch (err) {
-      Logger.log("AdenTech quote draft was not fully processed; the next run will retry: " + err);
+      Logger.log("AdenTech quote draft was not fully processed; the next run will retry.");
     }
   });
 }
@@ -225,7 +234,12 @@ function isAdenTechQuoteConversation_(thread) {
   const messages = thread.getMessages();
   const firstBody = messages && messages.length ? messages[0].getPlainBody() : "";
   const firstSubject = thread.getFirstMessageSubject() || "";
-  return /adentech/i.test(firstSubject) && /quote/i.test(firstSubject) &&
+  const ownerEmail = String(Session.getEffectiveUser().getEmail() || "").toLowerCase();
+  const firstSender = messages && messages.length ? extractEmail_(messages[0].getFrom()).toLowerCase() : "";
+  const request = extractRequestDetails_(thread);
+  return !!ownerEmail && firstSender === ownerEmail && /adentech/i.test(firstSubject) &&
+    /quote/i.test(firstSubject) && /type:\s*.*quote/i.test(firstBody) &&
+    !!request.customerEmail && isValidEmail_(request.customerEmail) &&
     !!findReference_(firstSubject + "\n" + firstBody);
 }
 
@@ -291,9 +305,11 @@ function findReference_(text) {
 function uniqueThreads_(queries) {
   const found = {};
   queries.forEach(function (query) {
-    GmailApp.search(query, 0, 100).forEach(function (thread) {
-      found[thread.getId()] = thread;
-    });
+    for (let start = 0; ; start += 100) {
+      const page = GmailApp.search(query, start, 100);
+      page.forEach(function (thread) { found[thread.getId()] = thread; });
+      if (page.length < 100) break;
+    }
   });
   return Object.keys(found).map(function (id) { return found[id]; });
 }

@@ -283,3 +283,15 @@ test("recovery worker sends a pending owner alert and never blindly resends an u
   assert.equal(uncertainResult.uncertain, 1);
   assert.equal(uncertain.sent.length, sentBefore);
 });
+
+test("pending-review execution logs do not expose customer names or email addresses", () => {
+  const h = harness();
+  h.properties.setProperty("AT_REQUEST_PRIVATE", JSON.stringify({
+    status:"manual_review", reference:"ABCDEF1234567890", requestId:"private-id", createdAt:1,
+    reviewContext:{name:"Private Customer Name",email:"private@example.test"}
+  }));
+  const reviews = h.context.getPendingIntakeReviews();
+  assert.equal(reviews[0].name, "Private Customer Name");
+  assert.equal(reviews[0].email, "private@example.test");
+  assert.equal(h.warnings.some(line => /Private Customer Name|private@example\.test/.test(line)), false);
+});

@@ -60,6 +60,18 @@ The customer email is a receipt/reference acknowledgement only. Quote drafts are
 
 The intake recovery trigger is separate. `setupIntakeRecoveryTrigger()` creates one hourly trigger for `recoverPendingIntakeReviews()` and is idempotent. It has not been run. The owner can first inspect the queue manually, then decide whether to authorize this trigger.
 
+## Optional Gmail-to-Sheets ticket monitor
+
+`apps-script/TicketMonitor.gs` reads the existing `AdenTech/Quotes` and
+`AdenTech/Enquiries` labels and maintains a Google Sheets ticket log. It is
+not enabled by this repository change. Read
+[`apps-script/TICKET_MONITOR_SETUP.md`](apps-script/TICKET_MONITOR_SETUP.md)
+for the spreadsheet properties, required Google scopes, controlled test,
+recommended 15-minute schedule, recovery behavior and rollback. Do not run
+`processAdenTechTickets()` or `setupAdenTechTicketMonitorTrigger()` against a
+live account until the owner has reviewed and explicitly approved access and
+trigger creation. Mock tests do not verify live Gmail or Sheets behavior.
+
 ### Remove triggers during rollback
 
 In the relevant Apps Script project, open **Triggers** (clock icon), delete the trigger whose handler is `processAdenTechInbox` to stop the Gmail draft bot, or delete `recoverPendingIntakeReviews` to stop periodic intake recovery. Removing a trigger does not delete existing email or drafts. Do not run either setup function again unless the owner wants to reinstall that automation.
