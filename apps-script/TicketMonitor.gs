@@ -351,3 +351,73 @@ function appendTicketReview_(sheet, reason, reference, thread, details) {
     new Date(), reason, reference, thread.getPermalink ? thread.getPermalink() : "", id, "Open", details
   ]]);
 }
+
+/**
+ * Writes a website form submission to Tickets immediately, without waiting
+ * for the Gmail polling trigger. Best-effort only: if Sheets is unavailable,
+ * the Gmail monitor can still import the labeled owner notification later.
+ * Idempotent by reference; it never sends email or replies to customers.
+ */
+function syncAdenTechTicketFromWebsite_(request, state) {
+  const config = ticketConfig_();
+  const book = SpreadsheetApp.openById(config.spreadsheetId);
+  const sheet = ensureTicketSheet_(book, AT_TICKET.ticketsSheet, AT_TICKET.headers);
+  ensureTicketSheet_(book, AT_TICKET.reviewsSheet, AT_TICKET.reviewHeaders);
+
+  const reference = String(state.reference || "").toUpperCase();
+  if (!/^[A-F0-9]{8,16}$/.test(reference)) throw new Error("Ticket reference is invalid.");
+  const matches = findTicketRows_(sheet, reference);
+  if (matches.length > 1) throw new Error("Duplicate ticket references require owner review.");
+  const ownerThread = state.ownerThreadId ? GmailApp.getThreadById(state.ownerThreadId) : null;
+  if (!ownerThread) throw new Error("Owner notification thread is not available yet.");
+  const messages = ownerThread.getMessages();
+  if (!messages || !messages.length) throw new Error("Owner notification message is unavailable.");
+  const first = messages[0];
+  const firstId = String(first.getId() || "");
+  if (!firstId) throw new Error("Owner notification message ID is unavailable.");
+  const permalink = ticketSheetText_(ownerThread.getPermalink ? ownerThread.getPermalink() : "", 1000);
+  const details = request.payload || {};
+  const isQuote = request.kind === "quote";
+  const values = [
+    reference,
+    first.getDate(),
+    ticketSheetText_(request.name, 160),
+    ticketSheetText_(request.email, 254),
+    isQuote ? "Quote" : "Enquiry",
+    ticketSheetText_(details.subject || (isQuote ? "Quote request" : "Enquiry"), 250),
+    "Open",
+    first.getDate(),
+    "",
+    "Owner review",
+    permalink,
+    String(ownerThread.getId()),
+    firstId,
+    "",
+    firstId
+  ];
+
+  if (!matches.length) {
+    sheet.getRange(sheet.getLastRow() + 1, 1, 1, AT_TICKET.headers.length).setValues([values]);
+    return {ok:true, created:true, reference:reference};
+  }
+
+  const row = matches[0];
+  const existingAnchor = String(row.values[14] || "");
+  const existingThreadId = String(row.values[11] || "");
+  if ((existingAnchor && existingAnchor !== firstId) ||
+      (!existingAnchor && existingThreadId && existingThreadId !== String(ownerThread.getId()))) {
+    throw new Error("Ticket reference is already associated with a different Gmail thread.");
+  }
+  // Preserve any reply status/notes already recorded by the Gmail monitor.
+  row.values[1] = row.values[1] || values[1];
+  row.values[2] = row.values[2] || values[2];
+  row.values[3] = row.values[3] || values[3];
+  row.values[4] = values[4];
+  row.values[5] = row.values[5] || values[5];
+  row.values[10] = permalink;
+  row.values[11] = String(ownerThread.getId());
+  row.values[14] = firstId;
+  writeTicketRow_(sheet, row);
+  return {ok:true, created:false, reference:reference};
+}
+
