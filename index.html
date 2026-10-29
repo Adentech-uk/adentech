@@ -106,7 +106,6 @@
             <div class="field"><label for="kind">What do you need? *</label><select id="kind" name="kind" required><option value="enquiry">General enquiry</option><option value="quote">Request a quote</option></select></div>
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label for="phone">Phone number (optional)</label><input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="40" placeholder="If you prefer a call or text"></div>
             <div class="field"><label for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
             <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Monitor or workstation setup</option><option>Printer setup</option><option>Troubleshooting</option><option>Other</option></select></div>
             <div class="field"><label for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
@@ -172,7 +171,6 @@
       kind: kind.value,
       name: document.getElementById("name").value.trim(),
       email: document.getElementById("email").value.trim(),
-      phone: document.getElementById("phone").value.trim(),
       location: document.getElementById("location").value.trim(),
       equipment: document.getElementById("equipment").value.trim(),
       details: details.value.trim(),
