@@ -1,411 +1,114 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-GB">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AdenTech | Home and Small Office IT Setup</title>
-<meta name="description" content="Independent home and small office IT setup: computers, monitors, printers and workstations. One-off projects with weekend availability.">
-<style>
-html,body{margin:0;padding:0}
-body{background:#eaf0f7;padding:24px 12px}
-@media(max-width:700px){body{padding:0}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdenTech | Simple IT Setup at Home or Work</title>
+  <meta name="description" content="Friendly, practical computer, laptop, monitor, printer and workstation setup for homes and small offices in the local area.">
+  <meta name="theme-color" content="#0b1730">
+  <style>
+    :root{color-scheme:light;--ink:#14213a;--muted:#52627a;--blue:#1769e0;--pale:#edf4ff;--line:#dbe5f2}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f3f6fb;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.6}
+    a{color:inherit}
+    .site{max-width:1080px;margin:0 auto;background:#fff;min-height:100vh}
+    header{padding:22px clamp(20px,5vw,64px);display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid #edf1f6}
+    .brand{font-size:22px;font-weight:800;letter-spacing:-.5px;text-decoration:none}
+    .brand span{color:var(--blue)}
+    .header-link{font-weight:700;text-decoration:none;color:var(--blue)}
+    .hero{padding:clamp(48px,8vw,88px) clamp(20px,7vw,76px);background:linear-gradient(135deg,#09152b,#12396a);color:#fff}
+    .eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:700;color:#a9d0ff}
+    h1{font-size:clamp(36px,6vw,60px);line-height:1.08;letter-spacing:-1.5px;max-width:760px;margin:14px 0 20px}
+    .hero p{font-size:clamp(17px,2.3vw,20px);color:#e1ebfa;max-width:670px;margin:0 0 28px}
+    .button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;padding:13px 19px;border-radius:10px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;border:0;cursor:pointer}
+    .button:hover{filter:brightness(.94)}
+    .button.secondary{background:#fff;color:#16345c;border:1px solid var(--line)}
+    .hero .button.secondary{background:transparent;color:#fff;border-color:#7e9fc8}
+    .actions{display:flex;flex-wrap:wrap;gap:12px}
+    section{padding:clamp(36px,6vw,64px) clamp(20px,6vw,64px)}
+    h2{font-size:clamp(27px,4vw,36px);line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}
+    .intro{max-width:700px;color:var(--muted);margin:0 0 28px}
+    .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .card{padding:22px;border:1px solid var(--line);border-radius:15px;background:#fff}
+    .icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--pale);font-size:22px;margin-bottom:15px}
+    h3{margin:0 0 8px;font-size:19px}
+    .card p{color:var(--muted);margin:0}
+    .how{background:#f4f7fc}
+    .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+    .step{padding:18px;border-radius:12px;background:#fff;border:1px solid var(--line)}
+    .step b{display:block;margin-bottom:5px}
+    .contact{background:#0b1730;color:#fff}
+    .contact p{color:#d5e1f2;max-width:650px}
+    .booking-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:25px}
+    .booking-card{padding:22px;background:#fff;color:var(--ink);border-radius:14px}
+    .booking-card p{color:var(--muted);margin:7px 0 17px}
+    .button[aria-disabled="true"]{background:#e8edf5;color:#5b6678;cursor:not-allowed;pointer-events:none}
+    .status{font-size:13px;color:#d5e1f2;margin:15px 0 0}
+    footer{padding:23px 20px;text-align:center;color:#718096;font-size:13px}
+    @media(max-width:700px){.services,.steps,.booking-grid{grid-template-columns:1fr}header{padding:18px 20px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
+  </style>
 </head>
 <body>
-<div id="adentech-site" style="font-family:Arial,Helvetica,sans-serif;max-width:1100px;margin:0 auto;background:#fff;color:#172033;border-radius:18px;overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.12);">
-<style>
-#adentech-site *{box-sizing:border-box}
-#adentech-site a{transition:background .2s ease,transform .2s ease}
-#adentech-site .at-btn{display:inline-block;background:#1683ff;color:#fff;text-decoration:none;padding:14px 21px;border-radius:9px;font-weight:700}
-#adentech-site .at-btn:hover{background:#0868d7;transform:translateY(-1px)}
-#adentech-site .at-section{padding:42px 26px}
-#adentech-site .at-wrap{max-width:960px;margin:0 auto}
-#adentech-site .at-kicker{font-size:12px;letter-spacing:2px;font-weight:700;color:#80bdff}
-#adentech-site h1{font-size:clamp(32px,5vw,46px);line-height:1.12;margin:12px 0 16px;color:#fff}
-#adentech-site h2{font-size:clamp(25px,3.6vw,32px);line-height:1.2;margin:0 0 12px;color:#12233d}
-#adentech-site h3{font-size:21px;margin:0 0 8px;color:#12233d}
-#adentech-site p{line-height:1.65}
-#adentech-site .at-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-#adentech-site .at-card{border:1px solid #dce6f2;border-radius:14px;padding:22px;background:#fff}
-#adentech-site .at-icon{width:46px;height:46px;border-radius:12px;background:#e9f3ff;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:15px}
-#adentech-site .at-list{padding-left:19px;margin:12px 0 0;color:#536174;line-height:1.85}
-#adentech-site .at-muted{color:#536174}
-#adentech-site .at-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-#adentech-site .at-form{display:flex;flex-direction:column;gap:8px;margin-top:18px}
-#adentech-site .at-label{font-size:14px;font-weight:700;color:#26384f;margin-top:8px}
-#adentech-site .at-form input,#adentech-site .at-form textarea,#adentech-site .at-form select{width:100%;padding:13px 14px;border:1px solid #cbd8e7;border-radius:8px;font:inherit;font-size:16px;line-height:1.5;color:#172033;background:#fff}
-#adentech-site .at-form textarea{resize:vertical;min-height:120px}
-#adentech-site .at-form input:focus,#adentech-site .at-form textarea:focus,#adentech-site .at-form select:focus{outline:2px solid #1683ff;outline-offset:1px}
-#adentech-site .at-form-status{font-size:14px;line-height:1.5;color:#536174;margin:8px 0 0;min-height:1.5em}
-#adentech-site .at-form button:disabled{opacity:.65;cursor:wait}
-#adentech-site .at-card p{margin-top:8px}
-#adentech-site .at-card{height:100%}
-#adentech-site .at-btn{line-height:1.35;text-align:center}
-#adentech-site .at-section{scroll-margin-top:20px}
-#adentech-site .at-pill{display:inline-block;padding:7px 11px;border:1px solid rgba(255,255,255,.22);border-radius:999px;color:#e3efff;font-size:13px;margin:4px 5px 0 0}
-#adentech-site .at-step{background:#fff;border:1px solid #e1e7ef;border-radius:12px;padding:18px;text-align:center}
-#adentech-site .at-num{width:34px;height:34px;border-radius:50%;background:#1683ff;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto 12px}
-@media(max-width:700px){#adentech-site .at-section{padding:32px 18px}#adentech-site .at-grid{grid-template-columns:1fr}#adentech-site .at-hero-grid{grid-template-columns:1fr!important}#adentech-site .at-hero-art{display:none}#adentech-site .at-steps{grid-template-columns:1fr!important}}
-</style>
+<div class="site">
+  <header>
+    <a class="brand" href="#" aria-label="AdenTech home">Aden<span>Tech</span></a>
+    <a class="header-link" href="#start">Get started <span aria-hidden="true">→</span></a>
+  </header>
 
-<!-- HERO: clear offer and audience -->
-<section class="at-section" style="background:linear-gradient(135deg,#061426 0%,#0b2850 100%);color:#fff;padding-top:48px;padding-bottom:48px;">
-  <div class="at-wrap at-hero-grid" style="display:grid;grid-template-columns:1.15fr .85fr;gap:30px;align-items:center;">
-    <div>
-      <div class="at-kicker">ADENTECH · INDEPENDENT IT SETUP</div>
-      <h1>Home and Small Office IT Setup, Made Simple.</h1>
-      <p style="font-size:18px;color:#dce9f8;margin:0 0 20px;">Practical help setting up computers, monitors, printers and workstations — with clear communication and the work agreed in advance.</p>
-      <div style="margin-bottom:20px;"><span class="at-pill">One-off projects</span><span class="at-pill">Weekend availability</span><span class="at-pill">Setup and testing</span></div>
-      <a class="at-btn" href="#contact">Get a quote ↓</a>
-    </div>
-    <div class="at-hero-art" style="background:#0d315d;border:1px solid rgba(255,255,255,.15);border-radius:18px;padding:22px;">
-      <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="Illustration of a tested computer workstation" style="display:block;">
-        <rect x="12" y="12" width="416" height="276" rx="18" fill="#102f55"/>
-        <rect x="44" y="48" width="236" height="148" rx="10" fill="#071426" stroke="#62adff" stroke-width="3"/>
-        <rect x="59" y="63" width="206" height="116" rx="4" fill="#dbeafe"/>
-        <path d="M112 96h100M112 118h72M112 140h88" stroke="#8db7e8" stroke-width="8" stroke-linecap="round"/>
-        <rect x="136" y="201" width="54" height="8" rx="4" fill="#8fb9e8"/><rect x="112" y="210" width="102" height="8" rx="4" fill="#5d7fa6"/>
-        <rect x="310" y="76" width="72" height="112" rx="8" fill="#071426" stroke="#8fb9e8" stroke-width="3"/>
-        <rect x="320" y="87" width="52" height="75" rx="3" fill="#dbeafe"/>
-        <circle cx="346" cy="174" r="5" fill="#1683ff"/>
-        <circle cx="347" cy="235" r="25" fill="#1683ff"/><path d="M335 235l8 8 16-18" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-        <text x="44" y="260" font-size="13" fill="#dbeafe">CONNECT · CONFIGURE · TEST</text>
-      </svg>
-    </div>
-  </div>
-</section>
+  <main>
+    <section class="hero">
+      <div class="eyebrow">Independent IT setup · Local area</div>
+      <h1>Get your tech set up. Keep life simple.</h1>
+      <p>Practical, friendly help getting computers, laptops, monitors, printers and workstations connected, configured and ready to use at home or in a small office.</p>
+      <div class="actions">
+        <a class="button" href="#start">Get started</a>
+        <a class="button secondary" href="#services">See how we can help</a>
+      </div>
+    </section>
 
-<!-- SERVICE SCOPE -->
-<section class="at-section" style="background:#fff;">
-  <div class="at-wrap">
-    <div style="text-align:center;max-width:700px;margin:0 auto 26px;">
-      <h2>How AdenTech Can Help</h2>
-      <p class="at-muted" style="margin:0;">Focused, one-off setup work for home users, remote workers and small teams.</p>
-    </div>
-    <div class="at-grid">
-      <article class="at-card">
-        <div class="at-icon" aria-hidden="true">⌂</div>
-        <h3>Home Setup</h3>
-        <p class="at-muted">Get a home computer or remote-working desk set up and ready to use.</p>
-        <ul class="at-list"><li>Desktop or laptop setup</li><li>Monitor, keyboard, mouse and dock</li><li>Printer installation and connection</li><li>Connect devices to existing Wi-Fi</li><li>Basic Microsoft 365 sign-in checks</li></ul>
-      </article>
-      <article class="at-card">
-        <div class="at-icon" aria-hidden="true">▦</div>
-        <h3>Small Office Setup</h3>
-        <p class="at-muted">Practical workstation setup for small teams and agreed equipment moves.</p>
-        <ul class="at-list"><li>Workstations and peripherals</li><li>Monitors, docks and printers</li><li>Connect to an existing network</li><li>Set up agreed equipment at new desks</li><li>Basic checks and handover</li></ul>
-      </article>
-      <article class="at-card">
-        <div class="at-icon" aria-hidden="true">✓</div>
-        <h3>Testing & Handover</h3>
-        <p class="at-muted">Check the agreed equipment and explain what has been completed.</p>
-        <ul class="at-list"><li>Power and connection checks</li><li>Confirm agreed devices start correctly</li><li>Basic printer and peripheral test</li><li>Identify issues outside the agreed scope</li><li>Clear handover to the customer</li></ul>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="services">
+      <h2>Practical help, without the fuss.</h2>
+      <p class="intro">AdenTech focuses on one-off setup work, straightforward communication and testing the equipment we’ve agreed to work on.</p>
+      <div class="services">
+        <article class="card"><div class="icon" aria-hidden="true">💻</div><h3>Computer & laptop setup</h3><p>Get a new or existing computer ready for everyday use, with agreed initial setup and connection checks.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">🖥️</div><h3>Monitors & workstations</h3><p>Connect monitors, docks, keyboards and other desk equipment for a tidy, usable workspace.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">🖨️</div><h3>Printers & testing</h3><p>Set up compatible printers and peripherals, check the agreed connections and explain what’s been completed.</p></article>
+      </div>
+    </section>
 
-<!-- SIMPLE PROCESS -->
-<section class="at-section" style="background:#eef5fc;">
-  <div class="at-wrap">
-    <div style="text-align:center;margin-bottom:24px;"><h2>A Simple, Clear Process</h2></div>
-    <div class="at-grid at-steps" style="grid-template-columns:repeat(3,minmax(0,1fr));">
-      <div class="at-step"><div class="at-num">1</div><h3 style="font-size:18px;">Describe the Setup</h3><p class="at-muted" style="margin:0;">List the devices, what you need done and the location.</p></div>
-      <div class="at-step"><div class="at-num">2</div><h3 style="font-size:18px;">Agree Scope & Price</h3><p class="at-muted" style="margin:0;">Confirm what is included, timing and price before work begins.</p></div>
-      <div class="at-step"><div class="at-num">3</div><h3 style="font-size:18px;">Set Up & Test</h3><p class="at-muted" style="margin:0;">Complete the agreed tasks, check the equipment and hand over.</p></div>
-    </div>
-  </div>
-</section>
+    <section class="how">
+      <h2>A simple way to get started</h2>
+      <p class="intro">Choose how you want to start. We’ll confirm availability and the plan before any work is booked.</p>
+      <div class="steps">
+        <div class="step"><b>1. Tell us what you need</b><span>Use the social form when it’s connected, or email us for now.</span></div>
+        <div class="step"><b>2. Choose a suitable time</b><span>Use the booking calendar once the live booking link is added.</span></div>
+        <div class="step"><b>3. Confirm before we begin</b><span>We’ll agree the work and timing with you before starting.</span></div>
+      </div>
+    </section>
 
-<!-- TRUST / BOUNDARIES -->
-<section class="at-section" style="background:#071426;color:#dbeafe;">
-  <div class="at-wrap" style="max-width:800px;text-align:center;">
-    <h2 style="color:#fff;">Straightforward Work. Clear Expectations.</h2>
-    <p style="color:#dbeafe;margin:0;">AdenTech focuses on one-off setup and agreed equipment relocation. Weekend availability is limited and must be confirmed before booking. Internet-provider faults, hardware repairs, structured cabling, complex networking and specialist third-party systems may need the existing provider or another specialist. Any additional work and cost must be agreed first.</p>
-  </div>
-</section>
-
-<!-- CONTACT FORMS -->
-<section id="contact" class="at-section" style="background:#eef5fc;">
-  <div class="at-wrap">
-    <div style="text-align:center;max-width:720px;margin:0 auto 28px;">
-      <h2>How Can We Help?</h2>
-      <p class="at-muted" style="margin:0;">Tell us what equipment needs setting up and what you would like done. We’ll review the scope and reply with any questions before confirming a quote. No work is booked until you approve it.</p>
-    </div>
-    <div class="at-grid at-contact-grid">
-      <article class="at-card">
-        <div class="at-icon" aria-hidden="true">✓</div>
-        <h3>Get a Quote</h3>
-        <p class="at-muted">Tell us about your equipment and what you need. We’ll review the request and reply to clarify details before providing a quote.</p>
-        <form class="at-form" data-kind="quote">
-          <label for="q-name" class="at-label">Your name</label><input id="q-name" name="name" autocomplete="name" required>
-          <label for="q-email" class="at-label">Email address</label><input id="q-email" name="email" type="email" autocomplete="email" required>
-          <label for="q-location" class="at-label">Town or postcode</label><input id="q-location" name="location" autocomplete="postal-code" placeholder="e.g. NW2 3RU" required>
-          <label for="q-reference" class="at-label">Existing AdenTech reference (optional)</label><input id="q-reference" name="existingReference" maxlength="16" placeholder="Add this only if you’re following up on a quote request">
-          <label for="q-equipment" class="at-label">What equipment needs setting up?</label><input id="q-equipment" name="equipment" placeholder="e.g. one laptop and two monitors" required>
-          <label for="q-details" class="at-label">What would you like help with?</label><textarea id="q-details" name="details" rows="4" placeholder="Briefly describe what you want connected or set up." required></textarea>
-          <label for="q-timing" class="at-label">Preferred timing (optional)</label><input id="q-timing" name="timing" placeholder="e.g. weekend">
-          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Get a quote</button>
-          <p class="at-form-status" role="status" aria-live="polite"></p>
-        </form>
-      </article>
-      <article class="at-card">
-        <div class="at-icon" aria-hidden="true">✉</div>
-        <h3>General Enquiry</h3>
-        <p class="at-muted">Ask a question about our services, availability or whether your setup is within scope.</p>
-        <form class="at-form" data-kind="enquiry">
-          <label for="e-name" class="at-label">Your name</label><input id="e-name" name="name" autocomplete="name" required>
-          <label for="e-email" class="at-label">Email address</label><input id="e-email" name="email" type="email" autocomplete="email" required>
-          <label for="e-subject" class="at-label">Subject</label><input id="e-subject" name="subject" placeholder="What is your question about?" required>
-          <label for="e-message" class="at-label">Message</label><textarea id="e-message" name="details" rows="7" required></textarea>
-          <button class="at-btn" type="submit" style="border:0;cursor:pointer;font:inherit;font-weight:700;width:100%;">Send Enquiry</button>
-          <p class="at-form-status" role="status" aria-live="polite"></p>
-        </form>
-      </article>
-    </div>
-    <p class="at-muted" style="font-size:13px;text-align:center;margin:20px 0 0;">Please don’t include passwords or sensitive account information. Your details will be used to respond to your request.</p>
-  </div>
-</section>
-
-<footer style="background:#050e1c;color:#9fb2c9;text-align:center;padding:24px 18px;font-size:13px;">
-  <div style="font-size:18px;color:#fff;font-weight:700;margin-bottom:7px;">AdenTech</div>
-  <div>Reliable IT Support. Simple Solutions.</div>
-  <div style="margin-top:10px;">Independent home and small-office IT setup · One-off projects · Weekend availability</div>
-  <div style="margin-top:14px;color:#7f93ac;">© 2026 AdenTech</div>
-</footer>
-<script>
-(function(){
-  // Deploy apps-script/Code.gs as a Google Apps Script Web App, then paste its /exec URL here.
-  const FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbwgeEkPPd77azgFauKAKdJ1eIjzwqPhcvojv4OIreCYulqyK87Ff7Dw0zAzog1gT5PE/exec";
-  const PAYLOAD_FIELDS = ["kind","name","email","location","equipment","details","timing","subject","existingReference","fullAddress","deviceQuantity","jobType"];
-  const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  const STORAGE_VERSION = 2;
-  const MAX_PENDING_REQUESTS = 5;
-
-  function canonicalPayload(payload) {
-    return JSON.stringify(PAYLOAD_FIELDS.map(function(key){return [key, String(payload[key] || "").trim()];}));
-  }
-  function getSecureUuid() {
-    if (!window.crypto || typeof window.crypto.getRandomValues !== "function") return "";
-    if (typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
-    const bytes = new Uint8Array(16);
-    window.crypto.getRandomValues(bytes);
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    const hex = Array.from(bytes, function(byte){return byte.toString(16).padStart(2,"0");}).join("");
-    return hex.slice(0,8)+"-"+hex.slice(8,12)+"-"+hex.slice(12,16)+"-"+hex.slice(16,20)+"-"+hex.slice(20);
-  }
-  function storageFor() {
-    try {
-      return window.sessionStorage;
-    } catch (storageError) {
-      return null;
-    }
-  }
-  function payloadFor(form) {
-    const submitted = Object.fromEntries(new FormData(form).entries());
-    const kind = form.dataset.kind;
-    const payload = {};
-    PAYLOAD_FIELDS.forEach(function(key) {
-      payload[key] = String(submitted[key] || "").trim();
-    });
-    payload.kind = kind;
-    payload.fullAddress = "";
-    payload.deviceQuantity = "";
-    payload.jobType = kind === "quote" ? "Installation / setup" : "";
-    return payload;
-  }
-  function restorePayload(form, payload) {
-    Array.from(form.elements).forEach(function(element) {
-      if (element.name && Object.prototype.hasOwnProperty.call(payload, element.name)) {
-        element.value = payload[element.name];
-      }
-    });
-  }
-  function isFormBlank(form) {
-    return Array.from(form.elements).every(function(element) {
-      return !element.name || !String(element.value || "").trim();
-    });
-  }
-
-  document.querySelectorAll("#adentech-site .at-form").forEach(function(form){
-    const storageKey = "adentech-pending-v" + STORAGE_VERSION + "-" + form.dataset.kind;
-    const status = form.querySelector(".at-form-status");
-    let storage = storageFor();
-    let storageAvailable = !!storage;
-    let pendingRequests = [];
-    let pendingStateNeedsReview = false;
-    if (storage) {
-      try {
-        const legacyKey = "adentech-pending-" + form.dataset.kind;
-        if (storage.getItem(legacyKey)) {
-          pendingStateNeedsReview = true;
-          storage.setItem(storageKey + "-review-required", "1");
-          storage.removeItem(legacyKey);
-          status.textContent = "An earlier saved request could not be restored safely. Contact AdenTech before resubmitting if delivery may have occurred.";
-        }
-        pendingStateNeedsReview = storage.getItem(storageKey + "-review-required") === "1";
-        const saved = JSON.parse(storage.getItem(storageKey) || "null");
-        if (saved && saved.version === STORAGE_VERSION && saved.kind === form.dataset.kind && Array.isArray(saved.requests)) {
-          pendingRequests = saved.requests.filter(function(record) {
-            return record && UUID_V4.test(record.requestId) && record.payload && record.payload.kind === form.dataset.kind &&
-              canonicalPayload(record.payload) === record.canonical;
-          });
-          if (pendingRequests.length !== saved.requests.length) {
-            pendingStateNeedsReview = true;
-            storage.setItem(storageKey + "-review-required", "1");
-            status.textContent = "Some saved retry details could not be validated. Retry protection may be incomplete; contact AdenTech if a previous submission may have been delivered.";
-          }
-          pendingRequests.sort(function(a,b){return a.createdAt-b.createdAt;});
-          const mostRecent = pendingRequests[pendingRequests.length - 1];
-          if (mostRecent && isFormBlank(form)) {
-            restorePayload(form, mostRecent.payload);
-            status.textContent = "Your unfinished request was restored. Submit these unchanged answers to retry with the same reference.";
-          } else if (mostRecent && canonicalPayload(payloadFor(form)) !== mostRecent.canonical) {
-            status.textContent = "A different request is in progress. Submitting changed answers will create a new reference; earlier pending requests remain saved.";
-          }
-        } else if (saved) {
-          storage.removeItem(storageKey);
-          pendingStateNeedsReview = true;
-          storage.setItem(storageKey + "-review-required", "1");
-          status.textContent = "An older saved request could not be restored safely. Contact AdenTech before resubmitting if delivery may have occurred.";
-        }
-        if (pendingStateNeedsReview) status.textContent = "Saved request state could not be fully verified. Contact AdenTech before submitting again to avoid a possible duplicate.";
-      } catch (storageError) {
-        storageAvailable = false;
-        storage = null;
-        status.textContent = "Saved retry details could not be read. Retry protection across a reload cannot be guaranteed.";
-      }
-      if (storage) {
-        try {
-          const probe = storageKey + "-probe";
-          storage.setItem(probe, "1");
-          storage.removeItem(probe);
-        } catch (storageError) {
-          storageAvailable = false;
-          storage = null;
-          status.textContent = "This tab can read pending retry details but cannot save updates. Retry protection across a reload cannot be guaranteed.";
-        }
-      }
-    } else {
-      status.textContent = "This tab cannot save retry details. If delivery is uncertain, retry protection cannot be guaranteed.";
-    }
-
-    form.addEventListener("submit", async function(event){
-      event.preventDefault();
-      const button = form.querySelector('button[type="submit"]');
-      if (pendingStateNeedsReview) {
-        status.textContent = "A previous saved request could not be verified. Contact AdenTech before submitting again to avoid a possible duplicate.";
-        return;
-      }
-      if (!FORM_ENDPOINT || FORM_ENDPOINT.indexOf("PASTE_") === 0) {
-        status.textContent = "Our online form is being connected. Please contact us through our Fiverr service page for now.";
-        return;
-      }
-      const payload = payloadFor(form);
-      if (payload.kind === "quote") {
-        const bad = /^(test|testing|asdf|qwerty|n\/?a|none|unknown|xxx|123|1234|example)$/i;
-        const required = [
-          ["name", "Enter your real name."],
-          ["email", "Enter a valid email address."],
-          ["location", "Enter a town or UK postcode."],
-          ["equipment", "Tell us what equipment needs work."],
-          ["details", "Describe the actual work required in at least 20 characters."]
-        ];
-        for (const item of required) {
-          const value = String(payload[item[0]] || "").trim();
-          if (!value || bad.test(value)) {
-            status.textContent = item[1];
-            form.elements[item[0]]?.focus();
-            return;
-          }
-        }
-        if (String(payload.equipment).trim().length < 3 || bad.test(String(payload.equipment).trim())) {
-          status.textContent = "Enter the real equipment type, such as laptop, desktop or monitor.";
-          form.elements.equipment.focus(); return;
-        }
-        if (String(payload.details).trim().length < 20 || bad.test(String(payload.details).trim())) {
-          status.textContent = "Please describe the actual job in at least 20 characters; placeholder text such as “test” cannot be submitted.";
-          form.elements.details.focus(); return;
-        }
-        if (bad.test(String(payload.name).trim())) {
-          status.textContent = "Enter your real name rather than a test value.";
-          form.elements.name.focus(); return;
-        }
-        if (payload.existingReference && !/^[A-F0-9]{8,16}$/i.test(payload.existingReference)) {
-          status.textContent = "Enter the AdenTech reference shown in your earlier message, or leave this optional field blank.";
-          form.elements.existingReference.focus(); return;
-        }
-      }
-      if (!window.crypto || typeof window.crypto.getRandomValues !== "function") {
-        status.textContent = "This browser cannot create a secure request reference. Please try a current browser over HTTPS.";
-        return;
-      }
-      const canonical = canonicalPayload(payload);
-      const matchingIndex = pendingRequests.findIndex(function(record){return record.canonical === canonical;});
-      if (matchingIndex < 0 && pendingRequests.length >= MAX_PENDING_REQUESTS) {
-        status.textContent = "Several requests are still awaiting confirmation. Contact AdenTech before submitting another so none of their retry references are lost.";
-        return;
-      }
-      const matchingRecord = matchingIndex >= 0 ? pendingRequests[matchingIndex] : null;
-      const requestId = matchingRecord ? matchingRecord.requestId : getSecureUuid();
-      if (!requestId || !UUID_V4.test(requestId)) {
-        status.textContent = "A secure request reference could not be created. Please try again in a current browser over HTTPS.";
-        return;
-      }
-      const pendingRecord = matchingRecord || {requestId:requestId, payload:payload, canonical:canonical, createdAt:Date.now()};
-      if (!matchingRecord) pendingRequests.push(pendingRecord);
-      payload.requestId = requestId;
-      if (storageAvailable) {
-        try { storage.setItem(storageKey, JSON.stringify({version:STORAGE_VERSION, kind:payload.kind, requests:pendingRequests})); }
-        catch (storageError) { storageAvailable = false; storage = null; }
-      }
-      button.disabled = true;
-      status.textContent = storageAvailable ? "Sending your request…" : "Retry protection cannot be guaranteed because this browser could not save the request. Sending with an in-page reference…";
-      try {
-        const response = await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          mode: "cors",
-          headers: {"Content-Type":"text/plain;charset=utf-8"},
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-        if (!response.ok || !result.ok) {
-          if (response.ok && result.retryable !== true) {
-            status.textContent = result.message || "Please review the form and try again.";
-            return;
-          }
-          throw new Error("Request result could not be confirmed");
-        }
-        let localWarning = "";
-        pendingRequests = pendingRequests.filter(function(record){return record.requestId !== requestId;});
-        if (!storageAvailable && pendingRequests.length) localWarning = " Browser storage is unavailable; other pending requests are protected only in this tab.";
-        if (storage) {
-          try {
-            const saved = JSON.parse(storage.getItem(storageKey) || "null");
-            if (saved && saved.version === STORAGE_VERSION && saved.kind === payload.kind) {
-              if (pendingRequests.length) storage.setItem(storageKey, JSON.stringify({version:STORAGE_VERSION, kind:payload.kind, requests:pendingRequests}));
-              else storage.removeItem(storageKey);
-            }
-          } catch (storageError) {
-            storageAvailable = false;
-            localWarning = " The browser could not clear its saved retry details; contact AdenTech before retrying a restored request.";
-          }
-        }
-        form.reset();
-        status.textContent = result.message || ("Thanks — your request has been received for review. Reference: " + result.reference + ". We’ll reply by email.") +
-          localWarning;
-      } catch (error) {
-        status.textContent = storageAvailable
-          ? "We couldn’t confirm delivery. Your request is saved in this tab. Reloading will restore the same answers and reference; submit unchanged to retry. Changing an answer creates a new request."
-          : "We couldn’t confirm delivery. Retry protection cannot be guaranteed after this tab closes because browser storage failed. This page can reuse its in-memory reference if you retry unchanged.";
-      } finally {
-        button.disabled = false;
-      }
-    });
-  });
-})();
-</script>
+    <section class="contact" id="start">
+      <div class="eyebrow">Start here</div>
+      <h2 style="color:#fff">Let’s get your setup sorted.</h2>
+      <p>Use the options below to connect with AdenTech. The TikTok form and calendar buttons will be activated once their live links are supplied. You can email us in the meantime.</p>
+      <div class="booking-grid">
+        <div class="booking-card">
+          <div class="icon" aria-hidden="true">📱</div>
+          <h3>TikTok form</h3>
+          <p>Share a few details using the AdenTech form on TikTok.</p>
+          <a class="button" aria-disabled="true" tabindex="-1">TikTok form coming soon</a>
+        </div>
+        <div class="booking-card">
+          <div class="icon" aria-hidden="true">📅</div>
+          <h3>Choose a time</h3>
+          <p>See available times and request a suitable appointment.</p>
+          <a class="button" aria-disabled="true" tabindex="-1">Booking calendar coming soon</a>
+        </div>
+      </div>
+      <p class="status">Need to reach us now? <a href="mailto:adentech26@gmail.com?subject=AdenTech%20website%20request" style="color:#fff;font-weight:700">Email AdenTech</a>. Please don’t send passwords or sensitive account details.</p>
+    </section>
+  </main>
+  <footer>© 2026 AdenTech · Local home and small-office IT setup</footer>
 </div>
 </body>
 </html>
