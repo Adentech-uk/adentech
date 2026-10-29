@@ -21,7 +21,7 @@
     .eyebrow{text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:700;color:#a9d0ff}
     h1{font-size:clamp(36px,6vw,60px);line-height:1.08;letter-spacing:-1.5px;max-width:760px;margin:14px 0 20px}
     .hero p{font-size:clamp(17px,2.3vw,20px);color:#e1ebfa;max-width:670px;margin:0 0 28px}
-    .button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;padding:13px 19px;border-radius:10px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;border:0;cursor:pointer}
+    .button{display:inline-flex;justify-content:center;align-items:center;min-height:48px;padding:13px 19px;border-radius:10px;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;border:0;cursor:pointer;font:inherit;font-weight:700}
     .button:hover{filter:brightness(.94)}
     .button.secondary{background:#fff;color:#16345c;border:1px solid var(--line)}
     .hero .button.secondary{background:transparent;color:#fff;border-color:#7e9fc8}
@@ -43,10 +43,23 @@
     .booking-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:25px}
     .booking-card{padding:22px;background:#fff;color:var(--ink);border-radius:14px}
     .booking-card p{color:var(--muted);margin:7px 0 17px}
-    .button[aria-disabled="true"]{background:#e8edf5;color:#5b6678;cursor:not-allowed;pointer-events:none}
+    .form-card{margin-top:26px;padding:clamp(20px,4vw,32px);border-radius:16px;background:#fff;color:var(--ink)}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field.full{grid-column:1/-1}
+    .field label{font-weight:700;font-size:14px}
+    .field input,.field select,.field textarea{width:100%;border:1px solid #b9c7da;border-radius:8px;padding:12px;font:inherit;color:var(--ink);background:#fff}
+    .field textarea{min-height:130px;resize:vertical}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:3px solid #b9d5ff;border-color:var(--blue)}
+    .form-help{font-size:13px;color:var(--muted);margin:12px 0}
+    .form-status{padding:12px;border-radius:8px;background:#edf4ff;color:#17345c;margin-top:14px;display:none;overflow-wrap:anywhere}
+    .form-status.visible{display:block}
+    .form-status.error{background:#fff0f0;color:#8a2020}
+    .button[disabled]{opacity:.65;cursor:wait}
     .status{font-size:13px;color:#d5e1f2;margin:15px 0 0}
     footer{padding:23px 20px;text-align:center;color:#718096;font-size:13px}
-    @media(max-width:700px){.services,.steps,.booking-grid{grid-template-columns:1fr}header{padding:18px 20px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
+    .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+    @media(max-width:700px){.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:18px 20px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
   </style>
 </head>
 <body>
@@ -55,18 +68,16 @@
     <a class="brand" href="#" aria-label="AdenTech home">Aden<span>Tech</span></a>
     <a class="header-link" href="#start">Get started <span aria-hidden="true">→</span></a>
   </header>
-
   <main>
     <section class="hero">
       <div class="eyebrow">Friendly IT setup · Local area</div>
       <h1>Get your tech set up. Keep life simple.</h1>
       <p>Friendly, practical help setting up computers, laptops, monitors, printers and workstations at home or in small offices.</p>
       <div class="actions">
-        <a class="button" href="#start">Get started</a>
+        <a class="button" href="#start">Send an enquiry</a>
         <a class="button secondary" href="#services">See how we can help</a>
       </div>
     </section>
-
     <section id="services">
       <h2>Practical help, without the fuss.</h2>
       <p class="intro">AdenTech provides one-off setup services, clear communication and checks of the equipment we agree to work on.</p>
@@ -76,39 +87,126 @@
         <article class="card"><div class="icon" aria-hidden="true">🖨️</div><h3>Printers & testing</h3><p>Set up compatible printers and other devices, check the agreed connections and explain what has been done.</p></article>
       </div>
     </section>
-
     <section class="how">
       <h2>A simple way to get started</h2>
-      <p class="intro">Choose how you’d like to get in touch. We’ll discuss what you need and confirm availability before booking any work.</p>
+      <p class="intro">Tell us what you need using the form below. We’ll review your request and confirm availability before booking any work.</p>
       <div class="steps">
-        <div class="step"><b>1. Tell us what you need</b><span>Send us a request through our social form once it’s available, or email us in the meantime.</span></div>
-        <div class="step"><b>2. Choose a suitable time</b><span>The online booking calendar will be available once its link has been added.</span></div>
+        <div class="step"><b>1. Tell us what you need</b><span>Share a few details using our secure enquiry form.</span></div>
+        <div class="step"><b>2. We review your request</b><span>We’ll follow up if we need more information.</span></div>
         <div class="step"><b>3. Confirm before we begin</b><span>We’ll agree the work, timing and any costs with you before we begin.</span></div>
       </div>
     </section>
-
     <section class="contact" id="start">
       <div class="eyebrow">Start here</div>
       <h2 style="color:#fff">Let’s get your setup sorted.</h2>
-      <p>You can contact AdenTech using the email link below. Our TikTok enquiry form and online booking calendar are not available on this website yet.</p>
-      <div class="booking-grid">
-        <div class="booking-card">
-          <div class="icon" aria-hidden="true">📱</div>
-          <h3>TikTok form</h3>
-          <p>Our TikTok enquiry form is being set up. Please email us for now.</p>
-          <span class="button" aria-disabled="true">TikTok form coming soon</span>
-        </div>
-        <div class="booking-card">
-          <div class="icon" aria-hidden="true">📅</div>
-          <h3>Choose a time</h3>
-          <p>Our online booking calendar is not available yet. Please email us to discuss a suitable time.</p>
-          <span class="button" aria-disabled="true">Booking calendar coming soon</span>
-        </div>
+      <p>Use this form for a general enquiry or quote request. Sending a request does not create a booking or confirm a price. Quotes are reviewed by AdenTech before any price is confirmed.</p>
+      <div class="form-card">
+        <form id="enquiry-form">
+          <div class="form-grid">
+            <div class="field"><label for="kind">What do you need? *</label><select id="kind" name="kind" required><option value="enquiry">General enquiry</option><option value="quote">Request a quote</option></select></div>
+            <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
+            <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+            <div class="field"><label for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
+            <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Monitor or workstation setup</option><option>Printer setup</option><option>Troubleshooting</option><option>Other</option></select></div>
+            <div class="field"><label for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
+            <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop and 2 monitors"></div>
+            <div class="field"><label for="timing">Preferred timing</label><input id="timing" name="timing" maxlength="200" placeholder="e.g. weekday afternoon"></div>
+            <div class="field full"><label for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
+            <div class="field full"><label for="details">How can we help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
+            <div class="hp" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+          </div>
+          <p class="form-help">Please provide only a town or postcode, not your full address at this stage. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
+          <button class="button" id="submit-button" type="submit">Send enquiry</button>
+          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+        </form>
       </div>
-      <p class="status">Need help now? <a href="mailto:adentech26@gmail.com?subject=AdenTech%20website%20request" style="color:#fff;font-weight:700">Email AdenTech</a>. Please don’t send passwords or sensitive account details.</p>
+      <p class="status">Prefer email? <a href="mailto:adentech26@gmail.com?subject=AdenTech%20website%20request" style="color:#fff;font-weight:700">Contact AdenTech directly</a>. Do not send passwords or sensitive account details.</p>
     </section>
   </main>
   <footer>© 2026 AdenTech · Local home and small-office IT setup · <a href="privacy.html">Privacy policy</a></footer>
 </div>
+<script>
+(function(){
+  "use strict";
+  const endpoint = "https://script.google.com/macros/s/AKfycbyMtmrhpZSojYEZ0kZvFm_X3Q0qzcU2lavoPn9_T4VpZNm8hVDz-m0_aBnZdR2PFmRM/exec";
+  const form = document.getElementById("enquiry-form");
+  const kind = document.getElementById("kind");
+  const subject = document.getElementById("subject");
+  const details = document.getElementById("details");
+  const button = document.getElementById("submit-button");
+  const status = document.getElementById("form-status");
+  function setStatus(message, isError){
+    status.textContent = message;
+    status.className = "form-status visible" + (isError ? " error" : "");
+  }
+  function updateRequirements(){
+    const isQuote = kind.value === "quote";
+    subject.required = !isQuote;
+    subject.label = isQuote ? "Subject (optional for quotes)" : "Subject *";
+    details.minLength = isQuote ? 20 : 10;
+    details.placeholder = isQuote
+      ? "Describe the work, equipment and what you need done (at least 20 characters)."
+      : "Describe your question or problem (at least 10 characters).";
+  }
+  kind.addEventListener("change", updateRequirements);
+  updateRequirements();
+  form.addEventListener("submit", async function(event){
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+    if (document.getElementById("website").value) return;
+    const isQuote = kind.value === "quote";
+    if (isQuote && details.value.trim().length < 20) {
+      setStatus("For a quote request, please describe the work in at least 20 characters.", true);
+      details.focus();
+      return;
+    }
+    const requestId = (window.crypto && typeof window.crypto.randomUUID === "function")
+      ? window.crypto.randomUUID()
+      : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c){
+          const r = Math.random()*16|0; return (c === "x" ? r : (r&3|8)).toString(16);
+        });
+    const payload = {
+      requestId: requestId,
+      kind: kind.value,
+      name: document.getElementById("name").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      location: document.getElementById("location").value.trim(),
+      equipment: document.getElementById("equipment").value.trim(),
+      details: details.value.trim(),
+      timing: document.getElementById("timing").value.trim(),
+      subject: subject.value.trim(),
+      existingReference: "",
+      fullAddress: "",
+      deviceQuantity: document.getElementById("deviceQuantity").value.trim(),
+      jobType: document.getElementById("jobType").value,
+      photoLink: ""
+    };
+    button.disabled = true;
+    button.textContent = "Sending…";
+    setStatus("Sending your request…", false);
+    try {
+      // Apps Script web apps may redirect across origins. no-cors allows the
+      // browser to send the JSON request, but deliberately does not expose a
+      // readable response. Do not claim that the backend accepted it here.
+      await fetch(endpoint, {
+        method: "POST",
+        mode: "no-cors",
+        redirect: "follow",
+        headers: {"Content-Type":"text/plain;charset=utf-8"},
+        body: JSON.stringify(payload),
+        cache: "no-store"
+      });
+      setStatus("Your browser has sent the request. Google does not let this page verify the processing result, so this is not a confirmed receipt. If you do not receive an acknowledgement email within 5 minutes, please contact adentech26@gmail.com and mention that you submitted the website form.", false);
+      form.reset();
+      updateRequirements();
+    } catch (error) {
+      setStatus("We could not send the request from this browser. Please email adentech26@gmail.com instead. Your form details have been kept on this page.", true);
+    } finally {
+      button.disabled = false;
+      button.textContent = "Send enquiry";
+    }
+  });
+})();
+</script>
 </body>
 </html>
