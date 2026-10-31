@@ -1,2 +1,2 @@
-/* Set this to the deployed Cloudflare Worker URL ending in /api/enquiries. */
-window.ADENTECH_API_URL = "";
+/* Set this to the deployed Cloudflare Worker endpoint. */
+window.ADENTECH_API_URL = "https://adentech-enquiry-api.adentech26.workers.dev/api/enquiries";
