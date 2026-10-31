@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AdenTech | Practical IT Support & Computer Setup</title>
-  <meta name="description" content="Practical IT support and setup for home users and small businesses. Computer, laptop, monitor, printer and Microsoft 365 help in London.">
+  <meta name="description" content="Practical IT support and setup for home users and small businesses in the local area. Computer, laptop, monitor, printer and Microsoft 365 help.">
   <meta name="theme-color" content="#0b1730">
   <style>
     :root{color-scheme:light;--ink:#14213a;--muted:#52627a;--blue:#1769e0;--pale:#edf4ff;--line:#dbe5f2}
@@ -29,7 +29,7 @@
     section{padding:clamp(36px,6vw,64px) clamp(20px,6vw,64px)}
     h2{font-size:clamp(27px,4vw,36px);line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}
     .intro{max-width:700px;color:var(--muted);margin:0 0 28px}
-    .services{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+    .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     .card{padding:22px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--pale);font-size:22px;margin-bottom:15px}
     h3{margin:0 0 8px;font-size:19px}
@@ -59,6 +59,7 @@
     .status{font-size:13px;color:#d5e1f2;margin:15px 0 0}
     footer{padding:23px 20px;text-align:center;color:#718096;font-size:13px}
     .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+    @media(max-width:850px){.services{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:700px){.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:18px 20px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
   </style>
 </head>
@@ -72,9 +73,9 @@
     <section class="hero">
       <div class="eyebrow">Experienced IT support · Personal service</div>
       <h1>Practical IT support and setup for your home or small business.</h1>
-      <p>Experienced, straightforward help with computers, laptops, monitors, printers, Microsoft 365 and everyday IT problems. Tell me what you need and we can discuss the right next step. Weekend appointments may be available by prior arrangement.</p>
+      <p>Experienced, straightforward help with computers, laptops, monitors, printers, Microsoft 365 and everyday IT problems in the local area. Tell me what you need and we can discuss the right next step. Weekend appointments may be available by prior arrangement.</p>
       <div class="actions">
-        <a class="button" href="#start">Send an enquiry</a>
+        <a class="button" href="#start">Get a quote</a>
         <a class="button secondary" href="#services">Explore services</a>
       </div>
     </section>
@@ -108,23 +109,23 @@
     <section class="contact" id="start">
       <div class="eyebrow">Start here</div>
       <h2 style="color:#fff">Let’s talk about what you need.</h2>
-      <p>Tell me what is not working, what equipment you have, your town or postcode and when you would prefer an appointment. I will review the details, ask any follow-up questions and confirm whether I can help. Weekend appointments may be available by arrangement. Any work and price are agreed with you before it starts.</p>
+      <p>Tell me what is not working, what equipment you have, your town or postcode and when you would prefer an appointment. I provide support in the local area and will review the details, ask any follow-up questions and confirm whether I can help. Weekend appointments may be available by arrangement. Any work and price are agreed with you before it starts.</p>
       <div class="form-card">
         <form id="enquiry-form">
           <div class="form-grid">
             <div class="field"><label for="kind">What do you need? *</label><select id="kind" name="kind" required><option value="enquiry">General enquiry</option><option value="quote">Request a quote</option></select></div>
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
+            <div class="field"><label id="location-label" for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
             <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
-            <div class="field"><label for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
+            <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
             <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop and 2 monitors"></div>
             <div class="field"><label for="timing">Preferred timing</label><input id="timing" name="timing" maxlength="200" placeholder="e.g. weekday afternoon"></div>
             <div class="field full"><label id="subject-label" for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
             <div class="field full"><label for="details">How can we help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
             <div class="hp" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
           </div>
-          <p class="form-help">Please provide only a town or postcode, not your full address at this stage. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
+          <p class="form-help">Please provide only a town or postcode, not your full address or phone number at this stage. If you approve a quote and decide to proceed, AdenTech may ask for a phone number later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
           <button class="button" id="submit-button" type="submit">Send enquiry</button>
           <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
         </form>
@@ -143,6 +144,10 @@
   const subject = document.getElementById("subject");
   const subjectLabel = document.getElementById("subject-label");
   const details = document.getElementById("details");
+  const location = document.getElementById("location");
+  const locationLabel = document.getElementById("location-label");
+  const equipment = document.getElementById("equipment");
+  const equipmentLabel = document.getElementById("equipment-label");
   const button = document.getElementById("submit-button");
   const status = document.getElementById("form-status");
   function setStatus(message, isError){
@@ -153,6 +158,12 @@
     const isQuote = kind.value === "quote";
     subject.required = !isQuote;
     subjectLabel.textContent = isQuote ? "Subject (optional for quotes)" : "Subject *";
+    location.required = isQuote;
+    locationLabel.textContent = isQuote ? "Town or postcode *" : "Town or postcode";
+    location.placeholder = isQuote ? "Enter the town or postcode for this quote request" : "Town or postcode only (optional)";
+    equipment.required = isQuote;
+    equipment.minLength = isQuote ? 3 : 0;
+    equipmentLabel.textContent = isQuote ? "Equipment / make and model *" : "Equipment / make and model";
     details.minLength = isQuote ? 20 : 10;
     details.placeholder = isQuote
       ? "Describe the work, equipment and what you need done (at least 20 characters)."
@@ -206,9 +217,10 @@
         body: JSON.stringify(payload),
         cache: "no-store"
       });
-      setStatus("Your browser has sent the request. Google does not let this page verify the processing result, so this is not a confirmed receipt. If you do not receive an acknowledgement email within 5 minutes, please contact adentech26@gmail.com and mention that you submitted the website form.", false);
-      form.reset();
-      updateRequirements();
+      setStatus("Your browser has sent the request, but this page cannot confirm that it was received or processed. Your details have been kept on this page. Please check your email for an acknowledgement before submitting again. If no acknowledgement arrives within 5 minutes, contact adentech26@gmail.com and mention that you used the website form.", false);
+      // Keep the customer's entries visible: no-cors cannot confirm that the
+      // Apps Script processed the request, so clearing the form could lose data.
+      // Ask the customer to check for an acknowledgement before trying again.
     } catch (error) {
       setStatus("We could not send the request from this browser. Please email adentech26@gmail.com instead. Your form details have been kept on this page.", true);
     } finally {
