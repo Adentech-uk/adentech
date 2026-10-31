@@ -116,9 +116,9 @@
             <div class="field"><label for="kind">What do you need? *</label><select id="kind" name="kind" required><option value="enquiry">General enquiry</option><option value="quote">Request a quote</option></select></div>
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
+            <div class="field"><label id="location-label" for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
             <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
-            <div class="field"><label for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
+            <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
             <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop and 2 monitors"></div>
             <div class="field"><label for="timing">Preferred timing</label><input id="timing" name="timing" maxlength="200" placeholder="e.g. weekday afternoon"></div>
             <div class="field full"><label id="subject-label" for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
@@ -144,6 +144,10 @@
   const subject = document.getElementById("subject");
   const subjectLabel = document.getElementById("subject-label");
   const details = document.getElementById("details");
+  const location = document.getElementById("location");
+  const locationLabel = document.getElementById("location-label");
+  const equipment = document.getElementById("equipment");
+  const equipmentLabel = document.getElementById("equipment-label");
   const button = document.getElementById("submit-button");
   const status = document.getElementById("form-status");
   function setStatus(message, isError){
@@ -154,6 +158,12 @@
     const isQuote = kind.value === "quote";
     subject.required = !isQuote;
     subjectLabel.textContent = isQuote ? "Subject (optional for quotes)" : "Subject *";
+    location.required = isQuote;
+    locationLabel.textContent = isQuote ? "Town or postcode *" : "Town or postcode";
+    location.placeholder = isQuote ? "Enter the town or postcode for this quote request" : "Town or postcode only (optional)";
+    equipment.required = isQuote;
+    equipment.minLength = isQuote ? 3 : 0;
+    equipmentLabel.textContent = isQuote ? "Equipment / make and model *" : "Equipment / make and model";
     details.minLength = isQuote ? 20 : 10;
     details.placeholder = isQuote
       ? "Describe the work, equipment and what you need done (at least 20 characters)."
