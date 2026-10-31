@@ -1,23 +1,23 @@
 # AdenTech
 
-AdenTech helps home users, remote workers and small teams set up computers and workstations.
+AdenTech provides practical IT setup and support for home users, remote workers and small businesses in the local service area.
 
 ## Services
 
-- Desktop and laptop setup
-- Monitor, dock and peripheral setup
-- Printer installation and connection
+- Desktop and laptop setup and troubleshooting
+- Microsoft 365, Outlook and email help
+- Wi-Fi and network troubleshooting
+- Monitor, dock, printer and peripheral setup
 - Workstation setup, testing and handover
-- Agreed equipment moves between desks
 
 Visit the website for service information and to request a quote.
 
 ## Website
 
-The website is a static page in `index.html` and is intended for GitHub Pages.
+The public website is a static site in `index.html`, with its privacy notice in `privacy.html`. It is intended for GitHub Pages.
 
 ## Contact and quotes
 
-Use the website's contact form to submit an enquiry or quote request. Submissions are subject to review. A submission acknowledgement is not a confirmed quote or booking.
+Use the website's contact form to submit a general enquiry or quote request. Submissions are subject to review. A submission acknowledgement is not a confirmed quote or booking, and work and price must be agreed before work starts.
 
-Do not send passwords or sensitive account information through the form.
+Do not send passwords, payment-card details or sensitive account information through the form.
