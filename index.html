@@ -135,10 +135,11 @@
   </main>
   <footer>© 2026 AdenTech · Independent IT support and setup · Weekends by arrangement · <a href="privacy.html">Privacy policy</a></footer>
 </div>
+<script src="config.js"></script>
 <script>
 (function(){
   "use strict";
-  const endpoint = "https://script.google.com/macros/s/AKfycbyMtmrhpZSojYEZ0kZvFm_X3Q0qzcU2lavoPn9_T4VpZNm8hVDz-m0_aBnZdR2PFmRM/exec";
+  const endpoint = String(window.ADENTECH_API_URL || "").trim();
   const form = document.getElementById("enquiry-form");
   const kind = document.getElementById("kind");
   const subject = document.getElementById("subject");
@@ -154,6 +155,21 @@
     status.textContent = message;
     status.className = "form-status visible" + (isError ? " error" : "");
   }
+  function createRequestId(){
+    if (!window.crypto || !window.crypto.getRandomValues) throw new Error("Secure browser randomness is unavailable.");
+    if (typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    return Array.from(bytes, function(value){ return value.toString(16).padStart(2, "0"); }).join("")
+      .replace(/^(........)(....)(....)(....)(............)$/, "$1-$2-$3-$4-$5");
+  }
+  let requestId = createRequestId();
+  let submitted = false;
+  form.addEventListener("input", function(){
+    if (!submitted) requestId = createRequestId();
+  });
   function updateRequirements(){
     const isQuote = kind.value === "quote";
     subject.required = !isQuote;
@@ -181,11 +197,10 @@
       details.focus();
       return;
     }
-    const requestId = (window.crypto && typeof window.crypto.randomUUID === "function")
-      ? window.crypto.randomUUID()
-      : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c){
-          const r = Math.random()*16|0; return (c === "x" ? r : (r&3|8)).toString(16);
-        });
+    if (!endpoint) {
+      setStatus("The online form is not connected yet. Please email adentech26@gmail.com instead. Your form details have been kept on this page.", true);
+      return;
+    }
     const payload = {
       requestId: requestId,
       kind: kind.value,
@@ -200,30 +215,30 @@
       fullAddress: "",
       deviceQuantity: document.getElementById("deviceQuantity").value.trim(),
       jobType: document.getElementById("jobType").value,
-      photoLink: ""
+      photoLink: "",
+      website: document.getElementById("website").value.trim()
     };
     button.disabled = true;
     button.textContent = "Sending…";
     setStatus("Sending your request…", false);
     try {
-      // Apps Script web apps may redirect across origins. no-cors allows the
-      // browser to send the JSON request, but deliberately does not expose a
-      // readable response. Do not claim that the backend accepted it here.
-      await fetch(endpoint, {
+      const response = await fetch(endpoint, {
         method: "POST",
-        mode: "no-cors",
-        redirect: "follow",
-        headers: {"Content-Type":"text/plain;charset=utf-8"},
+        mode: "cors",
+        headers: {"Content-Type":"application/json"},
         body: JSON.stringify(payload),
         cache: "no-store"
       });
-      setStatus("Your browser has sent the request, but this page cannot confirm that it was received or processed. Your details have been kept on this page. Please check your email for an acknowledgement before submitting again. If no acknowledgement arrives within 5 minutes, contact adentech26@gmail.com and mention that you used the website form.", false);
-      // Keep the customer's entries visible: no-cors cannot confirm that the
-      // Apps Script processed the request, so clearing the form could lose data.
-      // Ask the customer to check for an acknowledgement before trying again.
+      const result = await response.json().catch(function(){ return null; });
+      if (!response.ok || !result || result.ok !== true || !/^AT-[A-F0-9]{10}$/.test(result.reference || "")) {
+        throw new Error(result && result.error ? result.error : "We could not confirm delivery to AdenTech.");
+      }
+      submitted = true;
+      setStatus("Thank you. Your request has been received by AdenTech. Your reference is " + result.reference + ". We will review the details and reply by email. This is not a confirmed quote or booking.", false);
+      button.disabled = true;
+      button.textContent = "Request received";
     } catch (error) {
-      setStatus("We could not send the request from this browser. Please email adentech26@gmail.com instead. Your form details have been kept on this page.", true);
-    } finally {
+      setStatus((error && error.message ? error.message : "We could not confirm delivery.") + " Your details are still on this page. Please try again or email adentech26@gmail.com.", true);
       button.disabled = false;
       button.textContent = "Send enquiry";
     }
