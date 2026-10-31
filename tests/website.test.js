@@ -43,7 +43,7 @@ test("form uses the JSON API and only confirms receipt after a valid server refe
   assert.match(html, /<script src="config\.js"><\/script>/);
   const endpointSetting = config.match(/window\.ADENTECH_API_URL\s*=\s*"([^"]*)"/);
   assert.ok(endpointSetting, "config.js must define ADENTECH_API_URL");
-  assert.ok(endpointSetting[1] === "" || /^https:\/\/[a-z0-9-]+\.workers\.dev\/api\/enquiries$/.test(endpointSetting[1]));
+  assert.ok(endpointSetting[1] === "" || /^https:\/\/(?:[a-z0-9-]+\.)+workers\.dev\/api\/enquiries$/.test(endpointSetting[1]));
   assert.match(script, /mode:\s*"cors"/);
   assert.match(script, /"Content-Type":"application\/json"/);
   assert.match(script, /response\.ok/);
