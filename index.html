@@ -40,11 +40,8 @@
     .promo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:28px 0 34px}
     .promo-card{overflow:hidden;border:1px solid #d7e3f2;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(19,52,91,.08);display:flex;flex-direction:column}
     .promo-card img{display:block;width:100%;height:170px;object-fit:cover}
-    .promo-copy{padding:16px;display:flex;flex-direction:column;align-items:flex-start;flex:1}
-    .promo-copy h3{font-size:17px}
-    .promo-copy p{font-size:14px;color:var(--muted);margin:0 0 15px}
-    .promo-copy a{margin-top:auto;color:var(--blue);font-weight:700;text-decoration:none}
-    .promo-kicker{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#1769e0;margin-bottom:6px}
+    .promo-copy{padding:14px 16px}
+    .promo-copy h3{font-size:17px;margin:0}
     @media(max-width:900px){.promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:520px){.promo-grid{grid-template-columns:1fr}.promo-card img{height:210px}}
     .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -107,10 +104,10 @@
       <h2>How I can help</h2>
       <p class="intro">From a new device to an awkward technical problem, here are the main ways I can help.</p>
       <div class="promo-grid" aria-label="AdenTech setup services">
-        <article class="promo-card"><img src="/assets/Cleansetup.jpg" alt="Neatly organised workstation with monitor and managed cables" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Workstation setup</span><h3>Workstation setup</h3><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/Setup.jpg" alt="Dual-monitor home office workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Monitor setup</span><h3>Monitor setup</h3><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/Printer.jpg" alt="Home user setting up a wireless printer" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Printer support</span><h3>Printer setup</h3><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/desktop.jpg" alt="Desktop computer, monitor and laptop workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Computer setup</span><h3>Computer setup</h3><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Cleansetup.jpg" alt="Neatly organised workstation with monitor and managed cables" loading="lazy" decoding="async"><div class="promo-copy"><h3>Workstation setup</h3></div></article>
+        <article class="promo-card"><img src="/assets/Setup.jpg" alt="Dual-monitor home office workstation" loading="lazy" decoding="async"><div class="promo-copy"><h3>Monitor setup</h3></div></article>
+        <article class="promo-card"><img src="/assets/Printer.jpg" alt="Home user setting up a wireless printer" loading="lazy" decoding="async"><div class="promo-copy"><h3>Printer setup</h3></div></article>
+        <article class="promo-card"><img src="/assets/desktop.jpg" alt="Desktop computer, monitor and laptop workstation" loading="lazy" decoding="async"><div class="promo-copy"><h3>Computer setup</h3></div></article>
       </div>
       <div class="services">
         <article class="card"><div class="icon" aria-hidden="true">💻</div><h3>PCs, laptops & new equipment</h3><p>Set up a new computer or laptop, configure Windows, install everyday software and help resolve common device problems.</p></article>
