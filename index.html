@@ -175,7 +175,11 @@
   }
   function escapeHtml(value){
     return String(value).replace(/[&<>"']/g, function(character){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;","'":"&#39;"}[character];
+      if (character === "&") return "&amp;";
+      if (character === "<") return "&lt;";
+      if (character === ">") return "&gt;";
+      if (character === '"') return "&quot;";
+      return "&#39;";
     });
   }
   function createRequestId(){
