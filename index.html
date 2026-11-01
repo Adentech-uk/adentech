@@ -43,6 +43,16 @@
     .intro{max-width:700px;color:var(--muted);margin:0 0 28px}
     #services{background:linear-gradient(145deg,#e4efff 0%,#f8fbff 100%)}
     #about{background:linear-gradient(135deg,#fff 0%,#e3edfa 100%)}
+    .promo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:28px 0 34px}
+    .promo-card{overflow:hidden;border:1px solid #d7e3f2;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(19,52,91,.08);display:flex;flex-direction:column}
+    .promo-card img{display:block;width:100%;height:170px;object-fit:cover}
+    .promo-copy{padding:16px;display:flex;flex-direction:column;align-items:flex-start;flex:1}
+    .promo-copy h3{font-size:17px}
+    .promo-copy p{font-size:14px;color:var(--muted);margin:0 0 15px}
+    .promo-copy a{margin-top:auto;color:var(--blue);font-weight:700;text-decoration:none}
+    .promo-kicker{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#1769e0;margin-bottom:6px}
+    @media(max-width:900px){.promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:520px){.promo-grid{grid-template-columns:1fr}.promo-card img{height:210px}}
     .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     .card{padding:22px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--pale);font-size:22px;margin-bottom:15px}
@@ -103,6 +113,12 @@
     <section id="services">
       <h2>How I can help</h2>
       <p class="intro">I offer practical, clearly scoped IT support and setup. If you are unsure what you need, get in touch and we can discuss the issue before deciding on the next step.</p>
+      <div class="promo-grid" aria-label="AdenTech setup services">
+        <article class="promo-card"><img src="/assets/Cleansetup.jpg" alt="Neatly organised workstation with monitor and managed cables" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Workstation setup</span><h3>A tidier, better-connected workspace</h3><p>Help connecting your equipment and organising your desk setup.</p><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Setup.jpg" alt="Dual-monitor home office workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Monitor setup</span><h3>Make your screens work together</h3><p>Help with monitors, docking stations, peripherals and display setup.</p><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Printer.jpg" alt="Home user setting up a wireless printer" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Printer support</span><h3>Get your printer connected</h3><p>Installation and connection help for your home or small office printer.</p><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/desktop.jpg" alt="Desktop computer, monitor and laptop workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Computer setup</span><h3>Ready for work and everyday use</h3><p>Help setting up a desktop, laptop and the accessories you rely on.</p><a href="#start">Get a quote →</a></div></article>
+      </div>
       <div class="services">
         <article class="card"><div class="icon" aria-hidden="true">💻</div><h3>PCs, laptops & new equipment</h3><p>New device setup, Windows configuration, user profiles, software installation and getting your equipment ready for everyday use.</p></article>
         <article class="card"><div class="icon" aria-hidden="true">☁️</div><h3>Microsoft 365 & email</h3><p>Help with Microsoft 365, Outlook, email accounts, OneDrive, Teams and everyday account or access issues.</p></article>
