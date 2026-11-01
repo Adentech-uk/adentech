@@ -75,6 +75,9 @@
     .button[disabled]{opacity:.65;cursor:wait}
     .status{font-size:13px;color:#d5e1f2;margin:15px 0 0}
     footer{padding:23px 20px;text-align:center;color:#718096;font-size:13px}
+    .social-links{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;margin:12px 0}
+    .social-links a{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid #d4dfed;border-radius:999px;background:#fff;color:#17345c;text-decoration:none;font-weight:700}
+    .social-links a:hover{border-color:var(--blue);color:var(--blue)}
     .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
     @media(max-width:850px){.services{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:700px){.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:12px 18px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}.header-link{font-size:13px;padding:9px 11px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
@@ -151,7 +154,14 @@
       <p class="status">Prefer email? <a href="mailto:adentech26@gmail.com?subject=AdenTech%20website%20request" style="color:#fff;font-weight:700">Email AdenTech</a>. Do not send passwords or sensitive account details.</p>
     </section>
   </main>
-  <footer>© 2026 AdenTech · Independent IT support and setup · Weekends by arrangement · <a href="privacy.html">Privacy policy</a></footer>
+  <footer>
+    <div>© 2026 AdenTech · Independent IT support and setup · Weekends by arrangement</div>
+    <nav class="social-links" aria-label="AdenTech social links">
+      <a href="https://www.tiktok.com/@adentech_hq?lang=en" target="_blank" rel="noopener noreferrer" aria-label="Follow AdenTech on TikTok">♪ Follow on TikTok</a>
+      <a href="https://tiktok.me/group/ZNRT6gSv9/" target="_blank" rel="noopener noreferrer" aria-label="Join the AdenTech TikTok group">Join our TikTok group</a>
+    </nav>
+    <a href="privacy.html">Privacy policy</a>
+  </footer>
 </div>
 <script src="config.js"></script>
 <script>
