@@ -131,7 +131,7 @@
             <div class="field"><label for="kind">What do you need? *</label><select id="kind" name="kind" required><option value="enquiry">General enquiry</option><option value="quote">Request a quote</option></select></div>
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
-            <div class="field"><label id="location-label" for="location">Town or postcode</label><input id="location" name="location" maxlength="200" autocomplete="postal-code" placeholder="Town or postcode only"></div>
+            <div class="field"><label id="location-label" for="location">Postcode</label><input id="location" name="location" maxlength="20" autocomplete="postal-code" placeholder="Postcode only"></div>
             <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
             <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
             <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop and 2 monitors"></div>
@@ -140,8 +140,8 @@
             <div class="field full"><label for="details">How can we help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
             <div class="hp" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
           </div>
-          <p class="form-help">Please provide only a town or postcode, not your full address or phone number at this stage. If you approve a quote and decide to proceed, AdenTech may ask for a phone number later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
-          <button class="button" id="submit-button" type="submit">Send enquiry</button>
+          <p class="form-help">Please provide only your postcode, not your full address or phone number at this stage. If you approve a quote and decide to proceed, AdenTech may ask for a phone number later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
+          <button class="button" id="submit-button" type="submit">Submit</button>
           <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
         </form>
       </div>
@@ -187,11 +187,11 @@
   });
   function updateRequirements(){
     const isQuote = kind.value === "quote";
-    subject.required = !isQuote;
-    subjectLabel.textContent = isQuote ? "Subject (optional for quotes)" : "Subject *";
+    subject.required = true;
+    subjectLabel.textContent = "Subject *";
     location.required = isQuote;
-    locationLabel.textContent = isQuote ? "Town or postcode *" : "Town or postcode";
-    location.placeholder = isQuote ? "Enter the town or postcode for this quote request" : "Town or postcode only (optional)";
+    locationLabel.textContent = isQuote ? "Postcode *" : "Postcode";
+    location.placeholder = isQuote ? "Enter your postcode" : "Postcode only (optional)";
     equipment.required = isQuote;
     equipment.minLength = isQuote ? 3 : 0;
     equipmentLabel.textContent = isQuote ? "Equipment / make and model *" : "Equipment / make and model";
@@ -249,13 +249,17 @@
         throw new Error(result && result.error ? result.error : "We could not confirm delivery to AdenTech.");
       }
       submitted = true;
-      setStatus("Thank you. Your request has been received by AdenTech. Your reference is " + result.reference + ". We will review the details and reply by email. This is not a confirmed quote or booking.", false);
-      button.disabled = true;
-      button.textContent = "Request received";
+      form.reset();
+      updateRequirements();
+      requestId = createRequestId();
+      submitted = false;
+      setStatus("Thank you. Your request has been received by AdenTech. Your reference is " + result.reference + ". We will review the details and reply by email. This is not a confirmed quote or booking. The form is ready if you need to send another request.", false);
+      button.disabled = false;
+      button.textContent = "Submit";
     } catch (error) {
       setStatus((error && error.message ? error.message : "We could not confirm delivery.") + " Your details are still on this page. Please try again or email adentech26@gmail.com.", true);
       button.disabled = false;
-      button.textContent = "Send enquiry";
+      button.textContent = "Submit";
     }
   });
 })();
