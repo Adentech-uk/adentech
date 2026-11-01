@@ -66,9 +66,12 @@
     .field textarea{min-height:130px;resize:vertical}
     .field input:focus,.field select:focus,.field textarea:focus{outline:3px solid #b9d5ff;border-color:var(--blue)}
     .form-help{font-size:13px;color:var(--muted);margin:12px 0}
-    .form-status{padding:12px;border-radius:8px;background:#edf4ff;color:#17345c;margin-top:14px;display:none;overflow-wrap:anywhere}
+    .form-status{padding:16px 18px;border-radius:12px;background:#edf4ff;color:#17345c;margin-top:16px;display:none;overflow-wrap:anywhere;border:1px solid #d5e5fb}
     .form-status.visible{display:block}
-    .form-status.error{background:#fff0f0;color:#8a2020}
+    .form-status.success{background:#f0f8f3;color:#174b2b;border-color:#cce8d5}
+    .form-status.error{background:#fff0f0;color:#8a2020;border-color:#f3d0d0}
+    .form-status strong{display:block;font-size:16px;margin-bottom:5px}
+    .form-status p{margin:5px 0 0;color:inherit;font-size:14px}
     .button[disabled]{opacity:.65;cursor:wait}
     .status{font-size:13px;color:#d5e1f2;margin:15px 0 0}
     footer{padding:23px 20px;text-align:center;color:#718096;font-size:13px}
@@ -170,6 +173,11 @@
     status.textContent = message;
     status.className = "form-status visible" + (isError ? " error" : "");
   }
+  function escapeHtml(value){
+    return String(value).replace(/[&<>"']/g, function(character){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;","'":"&#39;"}[character];
+    });
+  }
   function createRequestId(){
     if (!window.crypto || !window.crypto.getRandomValues) throw new Error("Secure browser randomness is unavailable.");
     if (typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
@@ -253,7 +261,13 @@
       updateRequirements();
       requestId = createRequestId();
       submitted = false;
-      setStatus("Thank you. Your request has been received by AdenTech. Your reference is " + result.reference + ". We will review the details and reply by email. This is not a confirmed quote or booking. The form is ready if you need to send another request.", false);
+      if (result.customerReceiptSent === true) {
+        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. We've sent a confirmation email to " + escapeHtml(payload.email) + ".</p><p>We'll review your request and get back to you if we need any more information.</p><p><small>Reference: " + escapeHtml(result.reference) + " · This is not a confirmed quote or booking. If you can't see our email, please check your junk folder.</small></p>";
+        status.className = "form-status visible success";
+      } else {
+        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Your request has reached us, but we couldn't send the confirmation email.</p><p>Please check that your email address was entered correctly. Your reference is " + escapeHtml(result.reference) + ".</p><p><small>We'll review your request. This is not a confirmed quote or booking.</small></p>";
+        status.className = "form-status visible";
+      }
       button.disabled = false;
       button.textContent = "Submit";
     } catch (error) {
