@@ -18,6 +18,6 @@ The public website is a static site in `index.html`, with its privacy notice in 
 
 ## Contact and quotes
 
-Use the website's contact form to submit a general enquiry or quote request. The form sends the submission to the Cloudflare Worker in the private `Adentech-uk/adentech-private` repository, which validates it and uses Resend to email the owner at `adentech26@gmail.com`. The customer receives a reference only after the email provider confirms acceptance. The customer is not automatically sent a quote or acknowledgement email. Submissions are subject to owner review; work and price must be agreed before work starts. Google Apps Script and Google Sheets are not part of this intake route.
+Use the website's contact form to submit a general enquiry or quote request. The form sends the submission to the Cloudflare Worker in the private `Adentech-uk/adentech-private` repository. Resend sends an owner notification to `adentech26@gmail.com` and, after the owner notification is accepted, attempts a separate receipt-only email to the customer's submitted address. The receipt is not a quote, price confirmation or booking. The customer receives a reference only after the owner notification is accepted by Resend. Google Apps Script and Google Sheets are not part of this intake route.
 
 Do not send passwords, payment-card details or sensitive account information through the form.
