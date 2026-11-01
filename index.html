@@ -94,7 +94,7 @@
     <section class="hero">
       <div class="eyebrow">Experienced IT support · Personal service</div>
       <h1>Practical IT support and setup for your home or small business.</h1>
-      <p>Friendly, straightforward help getting your technology set up and working properly. Support for home users and small businesses, with clear explanations and the cost agreed before any work begins.</p>
+      <p>Friendly, straightforward help getting your technology set up and working properly. Based in NW8, I welcome enquiries from nearby areas and will confirm whether I can cover your location before agreeing any work. You’ll get clear explanations and the cost agreed in advance.</p>
       <div class="actions">
         <a class="button" href="#start">Get a quote</a>
         <a class="button secondary" href="#services">Explore services</a>
@@ -116,11 +116,11 @@
       </div>
     </section>
     <section id="about">
-      <h2>Professional experience. A personal approach.</h2>
-      <p class="intro">I bring professional IT support experience to a personal, straightforward service. I focus on understanding the problem, explaining the options clearly and treating your equipment and information with care.</p>
+      <h2>A real person, practical support</h2>
+      <p class="intro">I’m the person behind AdenTech. I started this service to make everyday technology easier to use, with patient support and straightforward explanations rather than confusing technical talk. I take time to understand what you need and treat your equipment and information with care.</p>
       <div class="services">
-        <article class="card"><h3>Customer-focused</h3><p>You will get patient, respectful support, plain-English explanations and a clear discussion before any work goes ahead.</p></article>
-        <article class="card"><h3>Qualified and continually learning</h3><p>I hold a BSc in Computer Science and have Cisco CCNA and CompTIA training. I continue to build my technical knowledge as technology develops.</p></article>
+        <article class="card"><h3>What you can expect</h3><p>You’ll deal directly with me from the first enquiry. I’ll explain the options, answer questions honestly and agree the work with you before getting started.</p></article>
+        <article class="card"><h3>Education and ongoing learning</h3><p>I hold a BSc in Computer Science and have undertaken Cisco CCNA and CompTIA training. I continue to develop my technical knowledge as technology changes.</p></article>
       </div>
     </section>
     <section class="how">
@@ -135,7 +135,7 @@
     <section class="contact" id="start">
       <div class="eyebrow">Start here</div>
       <h2 style="color:#fff">Let’s talk about what you need.</h2>
-      <p>Tell me what you need help with and your postcode. I will review your request, ask any follow-up questions and let you know whether the job is within my service area. We will agree the work and price before anything starts.</p>
+      <p>Tell me what you need help with and your postcode. I’ll check whether the location is within my service area, ask any useful follow-up questions and discuss the work and price with you before anything starts.</p>
       <div class="form-card">
         <form id="enquiry-form">
           <div class="form-grid">
@@ -145,14 +145,14 @@
             <div class="field"><label id="location-label" for="location">Postcode</label><input id="location" name="location" maxlength="20" autocomplete="postal-code" placeholder="Postcode only"></div>
             <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
             <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
-            <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop and 2 monitors"></div>
-            <div class="field"><label for="timing">Preferred timing</label><input id="timing" name="timing" maxlength="200" placeholder="e.g. weekday afternoon"></div>
+            <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop, 2 monitors and 1 printer"><span class="form-help">Include computers, monitors, printers and other equipment.</span></div>
+            <div class="field"><label for="timing">Preferred timing</label><select id="timing" name="timing"><option value="">No preference</option><option>Weekday morning</option><option>Weekday afternoon</option><option>Weekend (by arrangement)</option><option>I'm flexible</option></select></div>
             <div class="field full"><label id="subject-label" for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
             <div class="field full"><label for="details">How can we help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
             <div class="hp" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
           </div>
-          <p class="form-help">Please provide only your postcode, not your full address or phone number at this stage. If you approve a quote and decide to proceed, AdenTech may ask for a phone number later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond to your request. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
-          <button class="button" id="submit-button" type="submit">Submit</button>
+          <p class="form-help">Your postcode helps me check whether I can cover your area. Please don't enter your full address or phone number at this stage. If you decide to go ahead with a quote, I may ask for these details later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
+          <button class="button" id="submit-button" type="submit">Send my enquiry</button>
           <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
         </form>
       </div>
@@ -227,6 +227,7 @@
     details.placeholder = isQuote
       ? "Describe the work, equipment and what you need done (at least 20 characters)."
       : "Describe your question or problem (at least 10 characters).";
+    button.textContent = isQuote ? "Request my quote" : "Send my enquiry";
   }
   kind.addEventListener("change", updateRequirements);
   updateRequirements();
@@ -289,11 +290,11 @@
         status.className = "form-status visible";
       }
       button.disabled = false;
-      button.textContent = "Submit";
+      button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     } catch (error) {
       setStatus((error && error.message ? error.message : "We could not confirm delivery.") + " Your details are still on this page. Please try again or email adentech26@gmail.com.", true);
       button.disabled = false;
-      button.textContent = "Submit";
+      button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     }
   });
 })();
