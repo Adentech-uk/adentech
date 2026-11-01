@@ -21,12 +21,6 @@
     .brand-name{font-size:clamp(23px,3vw,31px);font-weight:800;letter-spacing:-.8px;color:#10284a}
     .brand-tagline{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#3970aa}
     .header-link{font-weight:700;text-decoration:none;color:var(--blue);padding:10px 15px;border:1px solid #c9dcf5;border-radius:999px;background:#fff}
-    .ticker{overflow:hidden;background:linear-gradient(90deg,#0b1c38,#164c83,#087fbd,#164c83,#0b1c38);color:#fff;border-bottom:3px solid #27b9f2}
-    .ticker-track{display:flex;width:max-content;animation:ticker-scroll 34s linear infinite}
-    .ticker-group{display:flex;align-items:center;gap:28px;padding:11px 14px;white-space:nowrap;font-size:12px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}
-    .ticker-dot{color:#54d9ff;font-size:18px}
-    @keyframes ticker-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    @media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}
     .hero{position:relative;overflow:hidden;padding:clamp(58px,9vw,104px) clamp(20px,7vw,76px);background:radial-gradient(ellipse at 88% 15%,rgba(25,171,255,.3),transparent 34%),radial-gradient(ellipse at 8% 100%,rgba(27,103,206,.35),transparent 38%),linear-gradient(125deg,#071329 0%,#0d2b50 54%,#14518a 100%);color:#fff}
     .hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 42px,rgba(255,255,255,.025) 43px 44px)}
     .hero>*{position:relative;z-index:1}
@@ -99,12 +93,11 @@
     <a class="brand" href="#" aria-label="AdenTech home"><img src="/assets/adentech-logo.svg" alt=""><span class="brand-copy"><span class="brand-name">AdenTech</span><span class="brand-tagline">IT Support &amp; Setup</span></span></a>
     <a class="header-link" href="#start">Get started <span aria-hidden="true">→</span></a>
   </header>
-  <div class="ticker" role="region" aria-label="AdenTech services"><div class="ticker-track" aria-hidden="true"><div class="ticker-group"><span>Local IT support</span><span class="ticker-dot">✦</span><span>Computer &amp; laptop setup</span><span class="ticker-dot">✦</span><span>Microsoft 365 &amp; email</span><span class="ticker-dot">✦</span><span>Wi-Fi, printers &amp; workstations</span><span class="ticker-dot">✦</span><span>Personal, practical help</span><span class="ticker-dot">✦</span></div><div class="ticker-group"><span>Local IT support</span><span class="ticker-dot">✦</span><span>Computer &amp; laptop setup</span><span class="ticker-dot">✦</span><span>Microsoft 365 &amp; email</span><span class="ticker-dot">✦</span><span>Wi-Fi, printers &amp; workstations</span><span class="ticker-dot">✦</span><span>Personal, practical help</span><span class="ticker-dot">✦</span></div></div></div>
   <main>
     <section class="hero">
       <div class="eyebrow">Experienced IT support · Personal service</div>
       <h1>Practical IT support and setup for your home or small business.</h1>
-      <p>Experienced, straightforward help with computers, laptops, monitors, printers, Microsoft 365 and everyday IT problems in the local area. Tell me what you need and we can discuss the right next step. Weekend appointments may be available by prior arrangement.</p>
+      <p>Friendly, straightforward help getting your technology set up and working properly. Support for home users and small businesses, with clear explanations and the cost agreed before any work begins.</p>
       <div class="actions">
         <a class="button" href="#start">Get a quote</a>
         <a class="button secondary" href="#services">Explore services</a>
@@ -112,41 +105,40 @@
     </section>
     <section id="services">
       <h2>How I can help</h2>
-      <p class="intro">I offer practical, clearly scoped IT support and setup. If you are unsure what you need, get in touch and we can discuss the issue before deciding on the next step.</p>
+      <p class="intro">From a new device to an awkward technical problem, here are the main ways I can help.</p>
       <div class="promo-grid" aria-label="AdenTech setup services">
-        <article class="promo-card"><img src="/assets/Cleansetup.jpg" alt="Neatly organised workstation with monitor and managed cables" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Workstation setup</span><h3>A tidier, better-connected workspace</h3><p>Help connecting your equipment and organising your desk setup.</p><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/Setup.jpg" alt="Dual-monitor home office workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Monitor setup</span><h3>Make your screens work together</h3><p>Help with monitors, docking stations, peripherals and display setup.</p><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/Printer.jpg" alt="Home user setting up a wireless printer" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Printer support</span><h3>Get your printer connected</h3><p>Installation and connection help for your home or small office printer.</p><a href="#start">Get a quote →</a></div></article>
-        <article class="promo-card"><img src="/assets/desktop.jpg" alt="Desktop computer, monitor and laptop workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Computer setup</span><h3>Ready for work and everyday use</h3><p>Help setting up a desktop, laptop and the accessories you rely on.</p><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Cleansetup.jpg" alt="Neatly organised workstation with monitor and managed cables" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Workstation setup</span><h3>Workstation setup</h3><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Setup.jpg" alt="Dual-monitor home office workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Monitor setup</span><h3>Monitor setup</h3><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/Printer.jpg" alt="Home user setting up a wireless printer" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Printer support</span><h3>Printer setup</h3><a href="#start">Get a quote →</a></div></article>
+        <article class="promo-card"><img src="/assets/desktop.jpg" alt="Desktop computer, monitor and laptop workstation" loading="lazy" decoding="async"><div class="promo-copy"><span class="promo-kicker">Computer setup</span><h3>Computer setup</h3><a href="#start">Get a quote →</a></div></article>
       </div>
       <div class="services">
-        <article class="card"><div class="icon" aria-hidden="true">💻</div><h3>PCs, laptops & new equipment</h3><p>New device setup, Windows configuration, user profiles, software installation and getting your equipment ready for everyday use.</p></article>
-        <article class="card"><div class="icon" aria-hidden="true">☁️</div><h3>Microsoft 365 & email</h3><p>Help with Microsoft 365, Outlook, email accounts, OneDrive, Teams and everyday account or access issues.</p></article>
-        <article class="card"><div class="icon" aria-hidden="true">📶</div><h3>Wi-Fi, networks & devices</h3><p>Practical troubleshooting for Wi-Fi, connectivity, printers, monitors, docking stations and workstation setups.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">💻</div><h3>PCs, laptops & new equipment</h3><p>Set up a new computer or laptop, configure Windows, install everyday software and help resolve common device problems.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">☁️</div><h3>Microsoft 365 & email</h3><p>Practical help with Outlook, email, OneDrive, Teams and Microsoft 365 setup or access problems.</p></article>
+        <article class="card"><div class="icon" aria-hidden="true">📶</div><h3>Wi-Fi, networks & devices</h3><p>Investigate connection problems and help get your Wi-Fi, printer and other devices working reliably together.</p></article>
       </div>
     </section>
     <section id="about">
       <h2>Professional experience. A personal approach.</h2>
-      <p class="intro">I work in IT support and have experience across 1st-, 2nd- and 3rd-line environments. My professional background includes user support, technical troubleshooting, Microsoft 365, Entra ID, Exchange Online, SharePoint, OneDrive, Windows devices, Active Directory, networking and PowerShell automation.</p>
+      <p class="intro">I bring professional IT support experience to a personal, straightforward service. I focus on understanding the problem, explaining the options clearly and treating your equipment and information with care.</p>
       <div class="services">
-        <article class="card"><h3>Technical knowledge</h3><p>My background includes service desk and engineering support, Microsoft cloud services, identity and access, endpoint support, Windows Server and network troubleshooting.</p></article>
-        <article class="card"><h3>Customer-focused</h3><p>I have worked directly with customers and users in IT and supervisory roles, with an emphasis on clear explanations, patience and resolving problems professionally.</p></article>
-        <article class="card"><h3>Qualified and continually learning</h3><p>My training includes a BSc in Computer Science, Cisco CCNA and CompTIA qualifications. I continue to develop my cloud and infrastructure skills.</p></article>
+        <article class="card"><h3>Customer-focused</h3><p>You will get patient, respectful support, plain-English explanations and a clear discussion before any work goes ahead.</p></article>
+        <article class="card"><h3>Qualified and continually learning</h3><p>I hold a BSc in Computer Science and have Cisco CCNA and CompTIA training. I continue to build my technical knowledge as technology develops.</p></article>
       </div>
     </section>
     <section class="how">
-      <h2>Not sure what you need? Start with a conversation.</h2>
-      <p class="intro">You do not need to know the technical terms. Explain what is happening or what you are trying to achieve, and I can help you work out a sensible next step.</p>
+      <h2>Getting help is straightforward</h2>
+      <p class="intro">No technical knowledge needed. Just tell me what you would like help with.</p>
       <div class="steps">
-        <div class="step"><b>1. Start a conversation</b><span>Tell me a little about the issue or setup you have in mind.</span></div>
-        <div class="step"><b>2. Discuss the options</b><span>I will clarify the requirement and let you know whether it is within my scope.</span></div>
-        <div class="step"><b>3. Agree the details</b><span>If it is suitable, we will agree the work, appointment and cost before proceeding.</span></div>
+        <div class="step"><b>1. Start a conversation</b><span>Describe the problem or what you want to set up.</span></div>
+        <div class="step"><b>2. Discuss the options</b><span>I will ask any useful questions and confirm whether I can help.</span></div>
+        <div class="step"><b>3. Agree the details</b><span>You will know the agreed work and price before anything starts.</span></div>
       </div>
     </section>
     <section class="contact" id="start">
       <div class="eyebrow">Start here</div>
       <h2 style="color:#fff">Let’s talk about what you need.</h2>
-      <p>Tell me what is not working, what equipment you have, your town or postcode and when you would prefer an appointment. I provide support in the local area and will review the details, ask any follow-up questions and confirm whether I can help. Weekend appointments may be available by arrangement. Any work and price are agreed with you before it starts.</p>
+      <p>Tell me what you need help with and your postcode. I will review your request, ask any follow-up questions and let you know whether the job is within my service area. We will agree the work and price before anything starts.</p>
       <div class="form-card">
         <form id="enquiry-form">
           <div class="form-grid">
