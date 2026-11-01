@@ -227,6 +227,7 @@
     details.placeholder = isQuote
       ? "Describe the work, equipment and what you need done (at least 20 characters)."
       : "Describe your question or problem (at least 10 characters).";
+    button.textContent = isQuote ? "Request my quote" : "Send my enquiry";
   }
   kind.addEventListener("change", updateRequirements);
   updateRequirements();
