@@ -290,11 +290,11 @@
         status.className = "form-status visible";
       }
       button.disabled = false;
-      button.textContent = "Submit";
+      button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     } catch (error) {
       setStatus((error && error.message ? error.message : "We could not confirm delivery.") + " Your details are still on this page. Please try again or email adentech26@gmail.com.", true);
       button.disabled = false;
-      button.textContent = "Submit";
+      button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     }
   });
 })();
