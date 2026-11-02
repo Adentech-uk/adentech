@@ -78,9 +78,9 @@ test("customer receipt status reflects provider acceptance without claiming deli
 });
 
 test("public contact and fallback email use the AdenTech support address", () => {
-  assert.match(html, /mailto:support@adentech\\.co\\.uk/);
-  assert.match(html, /email support@adentech\\.co\\.uk/i);
-  assert.doesNotMatch(html, /adentech26@gmail\\.com/i);
-  assert.match(privacy, /mailto:support@adentech\\.co\\.uk/);
-  assert.doesNotMatch(privacy, /adentech26@gmail\\.com/i);
+  assert.match(html, /mailto:support@adentech\.co\.uk/);
+  assert.match(html, /email support@adentech\.co\.uk/i);
+  assert.doesNotMatch(html, /adentech26@gmail\.com/i);
+  assert.match(privacy, /mailto:support@adentech\.co\.uk/);
+  assert.doesNotMatch(privacy, /adentech26@gmail\.com/i);
 });
