@@ -76,3 +76,11 @@ test("customer receipt status reflects provider acceptance without claiming deli
   assert.match(privacy, /separate receipt-only email to the email address you provided/i);
   assert.match(privacy, /replies to the customer receipt are directed to support@adentech\.co\.uk/i);
 });
+
+test("public contact and fallback email use the AdenTech support address", () => {
+  assert.match(html, /mailto:support@adentech\\.co\\.uk/);
+  assert.match(html, /email support@adentech\\.co\\.uk/i);
+  assert.doesNotMatch(html, /adentech26@gmail\\.com/i);
+  assert.match(privacy, /mailto:support@adentech\\.co\\.uk/);
+  assert.doesNotMatch(privacy, /adentech26@gmail\\.com/i);
+});
