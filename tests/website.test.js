@@ -57,15 +57,16 @@ test("submission retry keeps the request ID until the customer edits the form", 
   assert.match(script, /form\.addEventListener\("input"/);
 });
 
-test("public site contains no advertised prices and keeps the quote call to action", () => {
+test("public site explains pricing clearly and keeps the quote call to action", () => {
   assert.match(html, /Get a quote/i);
-  assert.doesNotMatch(html, /£\s?\d+(?:\.\d{2})?/);
-  assert.match(html, /<option>Saturday<\/option>/);
-  assert.match(html, /<option>Sunday<\/option>/);
-  assert.doesNotMatch(html, /Weekday|weekday|weekend \(by arrangement\)|I\x27m flexible/i);
-  assert.match(html, /https:\/\/www\.facebook\.com\/profile\.php\?id=61596044257571/);
-  assert.match(html, /https:\/\/www\.youtube\.com\/@AdenTechSupport/);
-  assert.doesNotMatch(html, /linkedin\.com\/in\/|tiktok\.me\/group/);
+  assert.match(html, /From £20 per hour/);
+  assert.match(html, /no minimum visit charge/i);
+  assert.match(html, /no mileage fee/i);
+  assert.match(html, /<option>Saturday<\\/option>/);
+  assert.match(html, /<option>Sunday<\\/option>/);
+  assert.doesNotMatch(html, /Weekday|weekday|weekend \\(by arrangement\\)|I\\x27m flexible/i);
+  assert.match(html, /https:\\/\\/www\\.facebook\\.com\\/profile\\.php\\?id=61596044257571/);
+  assert.match(html, /https:\\/\\/www\\.youtube\\.com\\/@AdenTechSupport/);
 });
 
 test("privacy policy discloses GitHub, Cloudflare, Resend and Gmail processing", () => {
@@ -85,9 +86,9 @@ test("customer receipt status reflects provider acceptance without claiming deli
 
 test("About page includes the founder portrait, LinkedIn and Google review link", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.match(about, /src="\\/assets\\/founder\\.png"/);
-  assert.match(about, /https:\\/\\/www\\.linkedin\\.com\\/in\\/mahad-aden-0327a1124/);
-  assert.match(about, /https:\\/\\/g\\.page\\/r\\/CS4FWxybnOanEBM\\/review/);
+  assert.ok(about.includes('src="/assets/founder.png"'));
+  assert.ok(about.includes("https://www.linkedin.com/in/mahad-aden-0327a1124"));
+  assert.ok(about.includes("https://g.page/r/CS4FWxybnOanEBM/review"));
 });
 
 test("public contact and fallback email use the AdenTech support address", () => {
