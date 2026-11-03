@@ -22,3 +22,9 @@ jobs:
           node-version: 22
       - name: Run website regression tests
         run: node --test tests/*.test.js
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Check responsive layout at phone, tablet and desktop widths
+        run: node tests/responsive-layout.test.js
