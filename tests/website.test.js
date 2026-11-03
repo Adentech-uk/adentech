@@ -130,3 +130,12 @@ test("About page has mobile viewport, touch-friendly navigation and narrow-scree
   assert.match(about, /@media\(max-width:360px\)/);
   assert.match(about, /overflow-x:hidden/);
 });
+
+
+test("founder story stacks below a centred portrait with a readable text column", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /\.founder\{grid-template-columns:minmax\(0,1fr\);gap:26px;justify-items:center\}/);
+  assert.match(about, /\.portrait\{display:block;width:min\(100%,280px\)/);
+  assert.match(about, /\.story\{width:100%;max-width:780px;margin:0 auto;text-align:left\}/);
+  assert.match(about, /\.story p\{margin:0 0 18px;line-height:1\.8/);
+});
