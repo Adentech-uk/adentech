@@ -86,6 +86,54 @@
     @media(max-width:850px){.services{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
     @media(max-width:700px){.site-nav{gap:10px}.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:12px 18px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}.header-link{font-size:13px;padding:9px 11px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
+  
+    /* Mobile-first usability refinements */
+    html{-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:hidden}
+    body{min-width:320px;overflow-x:hidden}
+    img{max-width:100%;height:auto}
+    .site{width:100%;overflow-x:clip}
+    button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+    .site-nav a,.social-links a,.button,nav a,.cta{min-height:44px}
+    .field input,.field select,.field textarea{font-size:16px}
+    .card,.step,.booking-card,.form-card{min-width:0}
+    p,h1,h2,h3,a,span{overflow-wrap:break-word}
+    @media(max-width:700px){
+      header{align-items:center;gap:8px}
+      .brand{min-width:0;gap:8px}
+      .brand img{flex:0 0 56px;width:56px;height:56px}
+      .brand-name{font-size:23px}
+      .brand-tagline{font-size:8px;letter-spacing:1px}
+      .site-nav{gap:6px;flex:0 0 auto}
+      .site-nav>a:first-child{padding:8px 9px}
+      .header-link{padding:8px 10px}
+      section{padding:36px 18px}
+      .hero{padding:48px 20px}
+      h1{font-size:clamp(34px,9vw,44px);letter-spacing:-1px}
+      .eyebrow{letter-spacing:1.4px}
+      .hero .actions{max-width:none}
+      .hero .button{min-height:48px}
+      .promo-grid{gap:12px}
+      .promo-card img{height:190px}
+      .card,.step{padding:19px}
+      .form-card{padding:18px 14px}
+      .form-grid{gap:14px}
+      .field input,.field select,.field textarea{min-height:48px;padding:12px}
+      .field textarea{min-height:150px}
+      #submit-button{width:100%;min-height:50px}
+      .social-links{gap:8px}
+      .social-links a{min-height:44px;padding:10px 13px}
+    }
+    @media(max-width:360px){
+      header{padding:10px 12px}
+      .brand img{width:48px;height:48px;flex-basis:48px}
+      .brand-name{font-size:21px}
+      .brand-tagline{font-size:7px;letter-spacing:.7px}
+      .site-nav{gap:4px}
+      .site-nav>a:first-child,.header-link{font-size:12px;padding:8px}
+      .hero{padding:42px 16px}
+      section{padding-left:15px;padding-right:15px}
+    }
+
   </style>
 </head>
 <body>
