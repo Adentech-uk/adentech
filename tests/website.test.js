@@ -113,3 +113,20 @@ test("public contact and fallback email use the AdenTech support address", () =>
   assert.match(privacy, /mailto:support@adentech\.co\.uk/);
   assert.doesNotMatch(privacy, /adentech26@gmail\.com/i);
 });
+
+
+test("homepage has mobile viewport, touch-sized controls and phone-friendly form inputs", () => {
+  assert.match(html, /name="viewport" content="width=device-width, initial-scale=1"/);
+  assert.match(html, /\.field input,\.field select,\.field textarea\{font-size:16px\}/);
+  assert.match(html, /min-height:48px;padding:12px/);
+  assert.match(html, /@media\(max-width:360px\)/);
+  assert.match(html, /overflow-x:hidden/);
+});
+
+test("About page has mobile viewport, touch-friendly navigation and narrow-screen layout", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /name="viewport" content="width=device-width, initial-scale=1"/);
+  assert.match(about, /nav a,.cta\{min-height:44px\}/);
+  assert.match(about, /@media\(max-width:360px\)/);
+  assert.match(about, /overflow-x:hidden/);
+});
