@@ -27,4 +27,4 @@ jobs:
           npm install --no-save --package-lock=false playwright@1.55.0
           npx playwright install --with-deps chromium
       - name: Check responsive layout at phone, tablet and desktop widths
-        run: node tests/responsive-layout.test.js
+        run: node scripts/check-responsive-layout.cjs
