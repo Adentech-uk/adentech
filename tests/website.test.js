@@ -15,6 +15,22 @@ test("website inline JavaScript parses", () => {
   assert.doesNotThrow(() => new vm.Script(script));
 });
 
+test("both pages provide keyboard skip navigation and visible focus styling", () => {
+  assert.ok(html.includes('href="#main-content">Skip to main content</a>'));
+  assert.ok(html.includes(':focus-visible'));
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.ok(about.includes('href="#main-content">Skip to main content</a>'));
+  assert.ok(about.includes(':focus-visible'));
+});
+
+test("website explains local coverage and quote expectations", () => {
+  assert.match(html, /Based in NW8 and serving nearby areas/i);
+  assert.match(html, /confirm whether your location is covered/i);
+  assert.match(html, /not a confirmed quote or booking/i);
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /share your postcode and I’ll confirm coverage/i);
+});
+
 test("website has no duplicate element IDs", () => {
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(ids.length, new Set(ids).size);
@@ -57,15 +73,15 @@ test("submission retry keeps the request ID until the customer edits the form", 
   assert.match(script, /form\.addEventListener\("input"/);
 });
 
-test("public site contains no advertised prices and keeps the quote call to action", () => {
-  assert.match(html, /Get a quote/i);
-  assert.doesNotMatch(html, /£\s?\d+(?:\.\d{2})?/);
-  assert.match(html, /<option>Saturday<\/option>/);
-  assert.match(html, /<option>Sunday<\/option>/);
-  assert.doesNotMatch(html, /Weekday|weekday|weekend \(by arrangement\)|I\x27m flexible/i);
-  assert.match(html, /https:\/\/www\.facebook\.com\/profile\.php\?id=61596044257571/);
-  assert.match(html, /https:\/\/www\.youtube\.com\/@AdenTechSupport/);
-  assert.doesNotMatch(html, /linkedin\.com\/in\/|tiktok\.me\/group/);
+test("public site explains pricing clearly and keeps the quote call to action", () => {
+  assert.ok(html.includes("Get a quote"));
+  assert.ok(html.includes("From £20 per hour"));
+  assert.ok(html.toLowerCase().includes("no minimum visit charge"));
+  assert.ok(html.toLowerCase().includes("no mileage fee"));
+  assert.ok(html.includes("<option>Saturday</option>"));
+  assert.ok(html.includes("<option>Sunday</option>"));
+  assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));
+  assert.ok(html.includes("https://www.youtube.com/@AdenTechSupport"));
 });
 
 test("privacy policy discloses GitHub, Cloudflare, Resend and Gmail processing", () => {
@@ -81,6 +97,13 @@ test("customer receipt status reflects provider acceptance without claiming deli
   assert.match(script, /couldn't confirm that a separate receipt email was accepted for sending/);
   assert.match(privacy, /separate receipt-only email to the email address you provided/i);
   assert.match(privacy, /replies to the customer receipt are directed to support@adentech\.co\.uk/i);
+});
+
+test("About page includes the founder portrait, LinkedIn and Google review link", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.ok(about.includes('src="/assets/founder.png"'));
+  assert.ok(about.includes("https://www.linkedin.com/in/mahad-aden-0327a1124"));
+  assert.ok(about.includes("https://g.page/r/CS4FWxybnOanEBM/review"));
 });
 
 test("public contact and fallback email use the AdenTech support address", () => {
