@@ -15,6 +15,22 @@ test("website inline JavaScript parses", () => {
   assert.doesNotThrow(() => new vm.Script(script));
 });
 
+test("both pages provide keyboard skip navigation and visible focus styling", () => {
+  assert.ok(html.includes('href="#main-content">Skip to main content</a>'));
+  assert.ok(html.includes(':focus-visible'));
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.ok(about.includes('href="#main-content">Skip to main content</a>'));
+  assert.ok(about.includes(':focus-visible'));
+});
+
+test("website explains local coverage and quote expectations", () => {
+  assert.match(html, /Based in NW8 and serving nearby areas/i);
+  assert.match(html, /confirm whether your location is covered/i);
+  assert.match(html, /not a confirmed quote or booking/i);
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /share your postcode and I’ll confirm coverage/i);
+});
+
 test("website has no duplicate element IDs", () => {
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
   assert.equal(ids.length, new Set(ids).size);
