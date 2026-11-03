@@ -139,3 +139,17 @@ test("founder story stacks below a centred portrait with a readable text column"
   assert.match(about, /\.story\{width:100%;max-width:780px;margin:0 auto;text-align:left\}/);
   assert.match(about, /\.story p\{margin:0 0 18px;line-height:1\.8/);
 });
+
+
+test("About values and commitments use fluid, readable cards at phone, tablet and desktop breakpoints", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /\.values \.grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(about, /\.commitments\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(about, /@media\(max-width:900px\)\{\s*\.commitments\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)\}/);
+  assert.match(about, /@media\(max-width:700px\)\{\s*\.values \.grid,\.commitments\{grid-template-columns:minmax\(0,1fr\);gap:14px\}/);
+  assert.match(about, /@media\(max-width:360px\)\{\s*\.values \.card,\.commitments \.card\{padding:18px\}/);
+  assert.match(about, /\.values \.card p,\.commitments \.card p\{[^}]*line-height:1\.75/);
+  assert.match(about, /@media\(prefers-reduced-motion:reduce\)\{\s*\.values \.card,\.commitments \.card\{transition:none\}/);
+  assert.match(about, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.doesNotMatch(about, /\.values \.card\{[^}]*width:\\s*\\d+px/);
+});
