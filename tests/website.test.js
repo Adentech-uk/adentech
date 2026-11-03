@@ -60,6 +60,12 @@ test("submission retry keeps the request ID until the customer edits the form", 
 test("public site contains no advertised prices and keeps the quote call to action", () => {
   assert.match(html, /Get a quote/i);
   assert.doesNotMatch(html, /£\s?\d+(?:\.\d{2})?/);
+  assert.match(html, /<option>Saturday<\/option>/);
+  assert.match(html, /<option>Sunday<\/option>/);
+  assert.doesNotMatch(html, /Weekday|weekday|weekend \(by arrangement\)|I\x27m flexible/i);
+  assert.match(html, /https:\/\/www\.facebook\.com\/profile\.php\?id=61596044257571/);
+  assert.match(html, /https:\/\/www\.youtube\.com\/@AdenTechSupport/);
+  assert.doesNotMatch(html, /linkedin\.com\/in\/|tiktok\.me\/group/);
 });
 
 test("privacy policy discloses GitHub, Cloudflare, Resend and Gmail processing", () => {
