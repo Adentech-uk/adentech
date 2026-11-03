@@ -83,6 +83,13 @@ test("customer receipt status reflects provider acceptance without claiming deli
   assert.match(privacy, /replies to the customer receipt are directed to support@adentech\.co\.uk/i);
 });
 
+test("About page includes the founder portrait, LinkedIn and Google review link", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /src="\\/assets\\/founder\\.png"/);
+  assert.match(about, /https:\\/\\/www\\.linkedin\\.com\\/in\\/mahad-aden-0327a1124/);
+  assert.match(about, /https:\\/\\/g\\.page\\/r\\/CS4FWxybnOanEBM\\/review/);
+});
+
 test("public contact and fallback email use the AdenTech support address", () => {
   assert.match(html, /mailto:support@adentech\.co\.uk/);
   assert.match(html, /email support@adentech\.co\.uk/i);
