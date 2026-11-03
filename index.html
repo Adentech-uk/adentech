@@ -20,7 +20,7 @@
     .brand-copy{display:flex;flex-direction:column;line-height:1.08}
     .brand-name{font-size:clamp(23px,3vw,31px);font-weight:800;letter-spacing:-.8px;color:#10284a}
     .brand-tagline{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#3970aa}
-    .header-link{font-weight:700;text-decoration:none;color:var(--blue);padding:10px 15px;border:1px solid #c9dcf5;border-radius:999px;background:#fff}
+    .site-nav{display:flex;align-items:center;gap:18px}.site-nav>a:first-child{font-weight:700;text-decoration:none;color:#17345c}.header-link{font-weight:700;text-decoration:none;color:var(--blue);padding:10px 15px;border:1px solid #c9dcf5;border-radius:999px;background:#fff}
     .hero{position:relative;overflow:hidden;padding:clamp(58px,9vw,104px) clamp(20px,7vw,76px);background:radial-gradient(ellipse at 88% 15%,rgba(25,171,255,.3),transparent 34%),radial-gradient(ellipse at 8% 100%,rgba(27,103,206,.35),transparent 38%),linear-gradient(125deg,#071329 0%,#0d2b50 54%,#14518a 100%);color:#fff}
     .hero:after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(135deg,transparent 0 42px,rgba(255,255,255,.025) 43px 44px)}
     .hero>*{position:relative;z-index:1}
@@ -81,14 +81,14 @@
     .social-links a:hover{border-color:var(--blue);color:var(--blue)}
     .hp{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
     @media(max-width:850px){.services{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:700px){.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:12px 18px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}.header-link{font-size:13px;padding:9px 11px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
+    @media(max-width:700px){.site-nav{gap:10px}.services,.steps,.booking-grid,.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}header{padding:12px 18px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}.header-link{font-size:13px;padding:9px 11px}.hero .actions{align-items:stretch;flex-direction:column;max-width:340px}.hero .button{width:100%}}
   </style>
 </head>
 <body>
 <div class="site">
   <header>
     <a class="brand" href="#" aria-label="AdenTech home"><img src="/assets/adentech-logo.svg" alt=""><span class="brand-copy"><span class="brand-name">AdenTech</span><span class="brand-tagline">IT Support &amp; Setup</span></span></a>
-    <a class="header-link" href="#start">Get started <span aria-hidden="true">→</span></a>
+    <nav class="site-nav" aria-label="Main navigation"><a href="about.html">About</a><a class="header-link" href="#start">Get started <span aria-hidden="true">→</span></a></nav>
   </header>
   <main>
     <section class="hero">
@@ -97,7 +97,7 @@
       <p>Friendly, practical help with computers, laptops, Wi-Fi, printers and workstations. Based in NW8 and serving nearby areas. Clear advice and costs agreed before work begins.</p>
       <div class="actions">
         <a class="button" href="#start">Get a quote</a>
-        <a class="button secondary" href="#services">Explore services</a>
+        <a class="button secondary" href="about.html">Meet the founder</a><a class="button secondary" href="#services">Explore services</a>
       </div>
     </section>
     <section id="services">
@@ -115,8 +115,17 @@
         <article class="card"><div class="icon" aria-hidden="true">📶</div><h3>Wi-Fi, networks & devices</h3><p>Investigate connection problems and help get your Wi-Fi, printer and other devices working reliably together.</p></article>
       </div>
     </section>
+    <section id="rates">
+      <h2>Clear, straightforward pricing</h2>
+      <p class="intro">IT support starts from £20 per hour. There is no minimum visit charge and no mileage fee. I’ll explain the work and agree any costs with you before getting started.</p>
+      <div class="services">
+        <article class="card"><h3>From £20 per hour</h3><p>Pay for the time and work agreed. If the job needs more time or additional work, I’ll discuss it with you first.</p></article>
+        <article class="card"><h3>Free expert advice</h3><p>Ask for initial advice through the enquiry form. I’ll reply by email and arrange a phone call if I think it would help.</p></article>
+        <article class="card"><h3>Free follow-up visit</h3><p>If I’ve carried out work for you, I’ll make a free follow-up visit to check or correct that work. New or additional hands-on work is discussed and charged separately.</p></article>
+      </div>
+    </section>
     <section id="about">
-      <h2>A real person, practical support</h2>
+      <h2>A real person, practical support</h2><p class="intro">Read more about the founder, experience and values behind AdenTech on the <a href="about.html">About page</a>.</p>
       <p class="intro">AdenTech offers patient, straightforward support. You’ll deal directly with me, get clear explanations and agree the work before anything starts.</p>
       <div class="services">
         <article class="card"><h3>Experience and learning</h3><p>BSc Computer Science, with Cisco CCNA and CompTIA training.</p></article>
@@ -143,7 +152,7 @@
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
             <div class="field"><label id="location-label" for="location">Postcode</label><input id="location" name="location" maxlength="20" autocomplete="postal-code" placeholder="Postcode only"></div>
-            <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
+            <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose (optional)</option><option>Free IT advice</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
             <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
             <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop, 2 monitors and 1 printer"><span class="form-help">Include computers, monitors, printers and other equipment.</span></div>
             <div class="field"><label for="timing">Preferred timing</label><select id="timing" name="timing"><option value="">Choose a day</option><option>Saturday</option><option>Sunday</option></select></div>
@@ -166,7 +175,7 @@
       <a href="https://www.youtube.com/@AdenTechSupport" target="_blank" rel="noopener noreferrer" aria-label="Subscribe to AdenTech on YouTube">YouTube</a>
       <a href="https://www.tiktok.com/@adentech_hq?lang=en" target="_blank" rel="noopener noreferrer" aria-label="Follow AdenTech on TikTok">TikTok</a>
     </nav>
-    <a href="privacy.html">Privacy policy</a>
+    <a href="about.html">About AdenTech</a> · <a href="privacy.html">Privacy policy</a> · <a href="https://g.page/r/CS4FWxybnOanEBM/review" target="_blank" rel="noopener noreferrer">Leave a review</a>
   </footer>
 </div>
 <script src="config.js"></script>
