@@ -58,6 +58,21 @@
       section{padding-left:15px;padding-right:15px}
     }
 
+  
+    /* Founder story: portrait first, clean full-width reading column below */
+    .founder{grid-template-columns:minmax(0,1fr);gap:26px;justify-items:center}
+    .portrait{display:block;width:min(100%,280px);max-width:280px;aspect-ratio:1;object-fit:cover;margin:0 auto}
+    .story{width:100%;max-width:780px;margin:0 auto;text-align:left}
+    .story p{margin:0 0 18px;line-height:1.8;color:#34445d}
+    .story p:last-child{margin-bottom:0}
+    .story p a{font-weight:700;color:#1769e0;text-decoration-thickness:1px;text-underline-offset:3px}
+    @media(max-width:700px){
+      .founder{gap:22px}
+      .portrait{width:min(72vw,240px);max-width:240px;border-radius:18px}
+      .story{max-width:100%}
+      .story p{font-size:16px;line-height:1.75;margin-bottom:16px}
+    }
+
   </style>
 </head>
 <body><a class="skip-link" href="#main-content">Skip to main content</a><div class="site">
