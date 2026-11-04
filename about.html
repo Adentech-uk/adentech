@@ -12,7 +12,7 @@
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     :focus-visible{outline:3px solid #f0a000;outline-offset:3px}
-    body{margin:0;background:linear-gradient(135deg,#e7eef8,#f7f9fd 52%,#e6effb);color:var(--ink);font:16px/1.65 Arial,Helvetica,sans-serif}
+    body{margin:0;background:linear-gradient(135deg,#e7eef8,#f7f9fd 52%,#e6effb);color:var(--ink);font:16px/1.65 Arial,Helvetica,sans-serif;overflow-x:hidden}
     a{color:inherit}
     .site{max-width:1080px;margin:0 auto;min-height:100vh;background:#f7faff;box-shadow:0 18px 65px rgba(17,43,78,.12)}
     header{padding:14px clamp(18px,5vw,56px);display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border-bottom:1px solid var(--line)}
@@ -22,7 +22,7 @@
     .brand-name{font-size:clamp(23px,3vw,31px);font-weight:800;letter-spacing:-.8px;color:#10284a}
     .brand-tagline{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#3970aa}
     nav{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-    nav a{font-weight:700;text-decoration:none;color:#17345c;padding:9px 12px;border-radius:999px}
+    nav a{font-weight:700;text-decoration:none;color:#17345c;padding:9px 12px;border-radius:999px;min-height:44px;display:inline-flex;align-items:center}
     nav a:hover{color:var(--blue);background:#edf4ff}
     main{padding:clamp(18px,4vw,42px)}
     .hero{padding:clamp(28px,5vw,54px);border-radius:18px;background:linear-gradient(125deg,#0b1730,#174775);color:#fff}
@@ -54,13 +54,13 @@
   </style>
 </head>
 <body>
-<a class="skip" href="#main">Skip to main content</a>
+<a class="skip" href="#main-content">Skip to main content</a>
 <div class="site">
   <header>
     <a class="brand" href="index.html" aria-label="AdenTech home"><img src="/assets/adentech-logo.svg" alt=""><span class="brand-copy"><span class="brand-name">AdenTech</span><span class="brand-tagline">IT Support &amp; Setup</span></span></a>
     <nav aria-label="Main navigation"><a href="index.html">Home</a><a href="pricing.html">Pricing</a></nav>
   </header>
-  <main id="main">
+  <main id="main-content">
     <section class="hero">
       <span class="eyebrow">About AdenTech</span>
       <h1>Personal IT support you can trust.</h1>
@@ -92,7 +92,7 @@
       <a class="button" href="index.html#start">Send an enquiry</a>
     </section>
   </main>
-  <footer>© 2026 AdenTech · <a href="index.html">Home</a> · <a href="pricing.html">Pricing</a> · <a href="privacy.html">Privacy policy</a></footer>
+  <footer>© 2026 AdenTech · <a href="index.html">Home</a> · <a href="pricing.html">Pricing</a> · <a href="privacy.html">Privacy policy</a> · <a href="https://g.page/r/CS4FWxybnOanEBM/review" target="_blank" rel="noopener noreferrer">Leave a review</a></footer>
 </div>
 </body>
 </html>
