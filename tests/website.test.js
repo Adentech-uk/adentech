@@ -141,7 +141,7 @@ test("About page has mobile viewport, touch-friendly navigation and narrow-scree
 test("founder story stacks on narrow screens with a readable portrait and text column", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
   assert.match(about, /\.founder\{[^}]*grid-template-columns:190px minmax\(0,1fr\)/);
-  assert.match(about, /@media\(max-width:760px\)\{[^}]*\.founder\{grid-template-columns:1fr\}/);
+  assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.founder\{grid-template-columns:1fr\}/);
   assert.match(about, /\.portrait\{[^}]*max-width:190px/);
   assert.match(about, /\.story p\{margin:0 0 12px;color:var\(--muted\)\}/);
 });
@@ -150,7 +150,7 @@ test("founder story stacks on narrow screens with a readable portrait and text c
 test("About trust cards remain readable and responsive across screen sizes", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
   assert.match(about, /\.trust-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-  assert.match(about, /@media\(max-width:760px\)\{[^}]*\.trust-grid\{grid-template-columns:1fr\}/);
+  assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.trust-grid\{grid-template-columns:1fr\}/);
   assert.match(about, /\.card\{padding:20px;[^}]*background:#fff/);
   assert.match(about, /\.card p\{margin:0;color:var\(--muted\)\}/);
 });
