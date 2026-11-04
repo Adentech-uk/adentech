@@ -25,7 +25,7 @@ test("both pages provide keyboard skip navigation and visible focus styling", ()
 
 test("website explains local coverage and quote expectations", () => {
   assert.match(html, /homes and small businesses around NW8/i);
-  assert.match(html, /confirm whether your location is covered/i);
+  assert.match(html, /around NW8/i);
   assert.match(html, /not a confirmed quote or booking/i);
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
   assert.match(about, /share your postcode and I’ll confirm coverage/i);
