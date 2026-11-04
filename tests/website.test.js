@@ -76,8 +76,10 @@ test("submission retry keeps the request ID until the customer edits the form", 
 test("public site explains pricing clearly and keeps the quote call to action", () => {
   assert.ok(html.includes("Get a quote"));
   assert.ok(html.includes("£20 per hour"));
-  assert.ok(html.includes("£50 minimum visit charge"));
-  assert.ok(html.includes("Travel is included in the quote"));
+  assert.ok(html.includes("one-hour minimum"));
+  assert.ok(html.includes("approximately 5 miles of NW8 is included"));
+  assert.ok(html.includes("View full pricing and what’s included"));
+  assert.doesNotMatch(html, /£50 minimum visit charge|Travel is included in the quote/);
   assert.ok(html.includes("<option>Saturday</option>"));
   assert.ok(html.includes("<option>Sunday</option>"));
   assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));
@@ -152,4 +154,16 @@ test("About values and commitments use fluid, readable cards at phone, tablet an
   assert.match(about, /@media\(prefers-reduced-motion:reduce\)\{\s*\.values \.card,\.commitments \.card\{transition:none\}/);
   assert.match(about, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.doesNotMatch(about, /\.values \.card\{[^}]*width:\s*\d+px/);
+});
+
+
+test("dedicated pricing page explains the introductory rate and local travel consistently", () => {
+  const pricing = fs.readFileSync(__dirname + "/../pricing.html", "utf8");
+  assert.match(pricing, /£20 per hour/);
+  assert.match(pricing, /first 10 customers only/i);
+  assert.match(pricing, /one-hour minimum/);
+  assert.match(pricing, /approximately 5 miles of NW8/);
+  assert.match(pricing, /not VAT registered/i);
+  assert.match(pricing, /index\.html#start/);
+  assert.doesNotMatch(pricing, /£50 minimum visit|£0\.45 per mile|VAT will be added/i);
 });
