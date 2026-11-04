@@ -75,9 +75,9 @@ test("submission retry keeps the request ID until the customer edits the form", 
 
 test("public site explains pricing clearly and keeps the quote call to action", () => {
   assert.ok(html.includes("Get a quote"));
-  assert.ok(html.includes("From £20 per hour"));
-  assert.ok(html.toLowerCase().includes("no minimum visit charge"));
-  assert.ok(html.toLowerCase().includes("no mileage fee"));
+  assert.ok(html.includes("£20 per hour"));
+  assert.ok(html.includes("£50 minimum visit charge"));
+  assert.ok(html.includes("Travel is included in the quote"));
   assert.ok(html.includes("<option>Saturday</option>"));
   assert.ok(html.includes("<option>Sunday</option>"));
   assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));
