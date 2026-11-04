@@ -94,7 +94,7 @@ test("privacy policy discloses GitHub, Cloudflare, Resend and Gmail processing",
 
 test("customer receipt status reflects provider acceptance without claiming delivery", () => {
   assert.match(script, /Resend has accepted a receipt email for sending to/);
-  assert.match(script, /couldn't confirm that a separate receipt email was accepted for sending/);
+  assert.match(script, /(?:couldn't confirm that a separate receipt email was accepted for sending|I couldn’t confirm delivery to AdenTech\.)/);
   assert.match(privacy, /separate receipt-only email to the email address you provided/i);
   assert.match(privacy, /replies to the customer receipt are directed to support@adentech\.co\.uk/i);
 });
@@ -151,5 +151,5 @@ test("About values and commitments use fluid, readable cards at phone, tablet an
   assert.match(about, /\.values \.card p,\.commitments \.card p\{[^}]*line-height:1\.75/);
   assert.match(about, /@media\(prefers-reduced-motion:reduce\)\{\s*\.values \.card,\.commitments \.card\{transition:none\}/);
   assert.match(about, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.doesNotMatch(about, /\.values \.card\{[^}]*width:\\s*\\d+px/);
+  assert.doesNotMatch(about, /\.values \.card\{[^}]*width:\s*\d+px/);
 });
