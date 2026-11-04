@@ -24,8 +24,8 @@ test("both pages provide keyboard skip navigation and visible focus styling", ()
 });
 
 test("website explains local coverage and quote expectations", () => {
-  assert.match(html, /Based in NW8 and serving nearby areas/i);
-  assert.match(html, /confirm whether your location is covered/i);
+  assert.match(html, /homes and small businesses around NW8/i);
+  assert.match(html, /around NW8/i);
   assert.match(html, /not a confirmed quote or booking/i);
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
   assert.match(about, /share your postcode and I’ll confirm coverage/i);
@@ -73,11 +73,24 @@ test("submission retry keeps the request ID until the customer edits the form", 
   assert.match(script, /form\.addEventListener\("input"/);
 });
 
-test("public site explains pricing clearly and keeps the quote call to action", () => {
-  assert.ok(html.includes("Get a quote"));
-  assert.ok(html.includes("£20 per hour"));
-  assert.ok(html.includes("£50 minimum visit charge"));
-  assert.ok(html.includes("Travel is included in the quote"));
+test("public site explains the approved introductory offer, pricing and booking CTA", () => {
+  assert.ok(html.includes("Local IT Support from £20 per hour"));
+  assert.ok(html.includes("INTRODUCTORY OFFER – £20 PER HOUR"));
+  assert.ok(html.includes("BOOK YOUR FIRST VISIT"));
+  assert.ok(html.includes("one-hour minimum booking (£20)"));
+  assert.ok(html.includes("within approximately 5 miles of NW8 is included"));
+  assert.ok(html.includes("not VAT registered, so no VAT is charged"));
+  assert.ok(html.includes("Parts and any additional work are agreed with you before proceeding"));
+  assert.doesNotMatch(html, /£50 minimum visit charge|Travel is included in the quote/i);
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.ok(about.includes("Local IT Support from £20 per hour"));
+  assert.ok(about.includes("INTRODUCTORY OFFER – £20 PER HOUR"));
+  assert.ok(about.includes("BOOK YOUR FIRST VISIT"));
+  assert.ok(about.includes("one-hour minimum booking (£20)"));
+  assert.ok(about.includes("within approximately 5 miles of NW8 is included"));
+  assert.ok(about.includes("not VAT registered, so no VAT is charged"));
+  assert.ok(about.includes("Parts and any additional work are agreed with you before proceeding"));
+  assert.doesNotMatch(about, /£50 minimum visit charge|Travel is included in the quote/i);
   assert.ok(html.includes("<option>Saturday</option>"));
   assert.ok(html.includes("<option>Sunday</option>"));
   assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));

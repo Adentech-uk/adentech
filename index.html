@@ -47,6 +47,13 @@
     .promo-copy h3{font-size:17px;margin:0}
     @media(max-width:900px){.promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media(max-width:520px){.promo-grid{grid-template-columns:1fr}.promo-card img{height:210px}}
+    .offer-banner{margin:0;padding:30px clamp(20px,6vw,64px);background:#fff4d6;border-top:1px solid #f1d28b;border-bottom:1px solid #f1d28b;color:#172b49}
+    .offer-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .offer-copy{max-width:680px}.offer-kicker{font-size:13px;font-weight:800;letter-spacing:1.5px;color:#805300;text-transform:uppercase}
+    .offer-banner h2{margin:5px 0 8px;color:#10284a}.offer-banner p{margin:0;color:#394b64}
+    .offer-cta{background:#f2b632!important;color:#172b49!important;border:2px solid #d99a12!important}
+    .offer-cta:hover{filter:brightness(.97)}
+    @media(max-width:700px){.offer-inner{align-items:stretch;flex-direction:column}.offer-banner .button{width:100%}}
     .services{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
     .card{padding:22px;border:1px solid var(--line);border-radius:15px;background:#fff}
     .icon{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:var(--pale);font-size:22px;margin-bottom:15px}
@@ -146,11 +153,22 @@
   <main id="main-content">
     <section class="hero">
       <div class="eyebrow">Experienced IT support · Personal service</div>
-      <h1>Friendly, professional IT support for your home or small business.</h1>
-      <p>Help with computer and laptop problems, Microsoft 365, Outlook, printers and Wi-Fi. Local support from an experienced IT engineer based in NW8 and serving nearby areas. Share your postcode and I’ll confirm whether your location is covered. You’ll receive a clear proposed solution and price before any chargeable work starts.</p>
+      <div class="eyebrow">Local IT support · Personal service</div>
+      <h1>Local IT Support from £20 per hour</h1>
+      <p>Need a hand with your computer, laptop, printer or workstation? I provide friendly, practical IT setup and support for homes and small businesses around NW8.</p>
       <div class="actions">
-        <a class="button" href="#start">Get a quote</a>
+        <a class="button offer-cta" href="#start">BOOK YOUR FIRST VISIT</a>
         <a class="button secondary" href="#services">View services</a>
+      </div>
+    </section>
+    <section class="offer-banner" aria-labelledby="intro-offer-title">
+      <div class="offer-inner">
+        <div class="offer-copy">
+          <div class="offer-kicker">Introductory offer</div>
+          <h2 id="intro-offer-title">INTRODUCTORY OFFER – £20 PER HOUR</h2>
+          <p>An affordable introductory rate for my first customers. Get practical local computer and IT setup support without complicated pricing.</p>
+        </div>
+        <a class="button offer-cta" href="#start">BOOK YOUR FIRST VISIT</a>
       </div>
     </section>
     <section id="services">
@@ -191,9 +209,9 @@
     </section>
     <section id="rates">
       <h2>Clear, straightforward pricing</h2>
-      <p class="intro">Labour is £20 per hour, with a £50 minimum visit charge. Travel is included in the quote, so I’ll confirm the total price with you before any work starts.</p>
+      <p class="intro">Labour is £20 per hour with a one-hour minimum booking (£20). Local travel within approximately 5 miles of NW8 is included.</p>
       <div class="services">
-        <article class="card"><h3>£20 per hour · £50 minimum visit</h3><p>Labour is charged at £20 per hour, with a £50 minimum visit charge. I’ll confirm the work and total price, including travel, before getting started.</p></article>
+        <article class="card"><h3>£20 per hour · one-hour minimum</h3><p>The minimum booking is one hour (£20). Local travel within approximately 5 miles of NW8 is included. AdenTech is not VAT registered, so no VAT is charged. Parts and any additional work are agreed with you before proceeding.</p></article>
         <article class="card"><h3>Free expert advice</h3><p>Ask for initial advice through the enquiry form. I’ll reply by email and arrange a phone call if I think it would help.</p></article>
         <article class="card"><h3>Three-day follow-up cover</h3><p>If the same issue returns within 3 days of the original work, I’ll arrange one free follow-up visit to check and correct it. New issues or additional work are discussed and charged separately.</p></article>
       </div>
