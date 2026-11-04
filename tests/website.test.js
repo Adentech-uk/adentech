@@ -166,3 +166,17 @@ test("dedicated pricing page explains the introductory rate and local travel con
   assert.match(pricing, /index\.html#start/);
   assert.doesNotMatch(pricing, /£50 minimum visit|£0\.45 per mile|VAT will be added/i);
 });
+
+test("responsive browser check targets the current About trust cards and real breakpoints", () => {
+  const responsive = fs.readFileSync(__dirname + "/../scripts/check-responsive-layout.cjs", "utf8");
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.match(about, /\.trust-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.trust-grid\{grid-template-columns:1fr\}/);
+  assert.match(responsive, /querySelector\("\.trust-grid"\)/);
+  assert.match(responsive, /querySelectorAll\("\.trust-grid \.card"\)/);
+  assert.match(responsive, /width <= 760 \? 1 : 3/);
+  assert.match(responsive, /layout\.documentWidth/);
+  assert.match(responsive, /card\.visible/);
+  assert.match(responsive, /card\.textWidth > 0 && card\.textHeight > 0/);
+  assert.doesNotMatch(responsive, /\.values \.grid|\.commitments/);
+});
