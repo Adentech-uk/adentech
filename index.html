@@ -366,7 +366,7 @@
       requestId = createRequestId();
       submitted = false;
       if (result.customerReceiptSent === true) {
-        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Resend has accepted a receipt email for sending to " + escapeHtml(payload.email) + ".</p><p>I’ll review your request and get back to you if we need any more information.</p><p><small>Reference: " + escapeHtml(result.reference) + " · This is not a confirmed quote or booking. If you can't see our email, please check your junk folder.</small></p>";
+        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Resend has accepted a receipt email for sending to " + escapeHtml(payload.email) + ".</p><p>I’ll review your request and get back to you if I need any more information.</p><p><small>Reference: " + escapeHtml(result.reference) + " · This is not a confirmed quote or booking. If you can't see my email, please check your junk folder.</small></p>";
         status.className = "form-status visible success";
       } else {
         status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Your request has reached us, but I couldn’t confirm that a separate receipt email was accepted for sending. Your reference is " + escapeHtml(result.reference) + ".</p><p><small>I’ll review your request. This is not a confirmed quote or booking.</small></p>";
