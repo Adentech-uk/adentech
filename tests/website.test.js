@@ -24,11 +24,11 @@ test("both pages provide keyboard skip navigation and visible focus styling", ()
 });
 
 test("website explains local coverage and quote expectations", () => {
-  assert.match(html, /Based in NW8 and serving nearby areas/i);
-  assert.match(html, /confirm whether your location is covered/i);
+  assert.match(html, /around NW8/i);
+  assert.match(html, /Your postcode helps me check whether I can cover your area/i);
   assert.match(html, /not a confirmed quote or booking/i);
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.match(about, /share your postcode and I’ll confirm coverage/i);
+  assert.match(about, /based in NW8 and focus on serving nearby areas/i);
 });
 
 test("website has no duplicate element IDs", () => {
@@ -73,13 +73,17 @@ test("submission retry keeps the request ID until the customer edits the form", 
   assert.match(script, /form\.addEventListener\("input"/);
 });
 
-test("public site explains pricing clearly and keeps the quote call to action", () => {
-  assert.ok(html.includes("Get a quote"));
-  assert.ok(html.includes("£20 per hour"));
-  assert.ok(html.includes("one-hour minimum"));
-  assert.ok(html.includes("approximately 5 miles of NW8 is included"));
-  assert.ok(html.includes("View full pricing and what’s included"));
-  assert.doesNotMatch(html, /£50 minimum visit charge|Travel is included in the quote/);
+test("homepage keeps pricing on its own page and retains the quote journey", () => {
+  const pricing = fs.readFileSync(__dirname + "/../pricing.html", "utf8");
+  assert.ok(html.includes('href="pricing.html">Pricing</a>'));
+  assert.ok(html.includes('href="#start">Get a quote</a>'));
+  assert.ok(html.includes('id="start"'));
+  assert.ok(html.includes('id="enquiry-form"'));
+  assert.doesNotMatch(html, /£20 per hour|one-hour minimum|£50 minimum visit charge/);
+  assert.match(pricing, /£20 per hour/);
+  assert.match(pricing, /one-hour minimum/);
+  assert.match(pricing, /approximately 5 miles of NW8 is included/);
+  assert.doesNotMatch(pricing, /£50 minimum visit charge|Travel is included in the quote/);
   assert.ok(html.includes("<option>Saturday</option>"));
   assert.ok(html.includes("<option>Sunday</option>"));
   assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));
@@ -128,32 +132,27 @@ test("homepage has mobile viewport, touch-sized controls and phone-friendly form
 test("About page has mobile viewport, touch-friendly navigation and narrow-screen layout", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
   assert.match(about, /name="viewport" content="width=device-width, initial-scale=1"/);
-  assert.match(about, /nav a,.cta\{min-height:44px\}/);
-  assert.match(about, /@media\(max-width:360px\)/);
+  assert.match(about, /nav a\{[^}]*min-height:44px/);
+  assert.match(about, /@media\(max-width:380px\)/);
   assert.match(about, /overflow-x:hidden/);
 });
 
 
-test("founder story stacks below a centred portrait with a readable text column", () => {
+test("founder story stacks on narrow screens with a readable portrait and text column", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.match(about, /\.founder\{grid-template-columns:minmax\(0,1fr\);gap:26px;justify-items:center\}/);
-  assert.match(about, /\.portrait\{display:block;width:min\(100%,280px\)/);
-  assert.match(about, /\.story\{width:100%;max-width:780px;margin:0 auto;text-align:left\}/);
-  assert.match(about, /\.story p\{margin:0 0 18px;line-height:1\.8/);
+  assert.match(about, /\.founder\{[^}]*grid-template-columns:190px minmax\(0,1fr\)/);
+  assert.match(about, /@media\(max-width:760px\)\{[^}]*\.founder\{grid-template-columns:1fr\}/);
+  assert.match(about, /\.portrait\{[^}]*max-width:190px/);
+  assert.match(about, /\.story p\{margin:0 0 12px;color:var\(--muted\)\}/);
 });
 
 
-test("About values and commitments use fluid, readable cards at phone, tablet and desktop breakpoints", () => {
+test("About trust cards remain readable and responsive across screen sizes", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.match(about, /\.values \.grid\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.match(about, /\.commitments\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
-  assert.match(about, /@media\(max-width:900px\)\{\s*\.commitments\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)\}/);
-  assert.match(about, /@media\(max-width:700px\)\{\s*\.values \.grid,\.commitments\{grid-template-columns:minmax\(0,1fr\);gap:14px\}/);
-  assert.match(about, /@media\(max-width:360px\)\{\s*\.values \.card,\.commitments \.card\{padding:18px\}/);
-  assert.match(about, /\.values \.card p,\.commitments \.card p\{[^}]*line-height:1\.75/);
-  assert.match(about, /@media\(prefers-reduced-motion:reduce\)\{\s*\.values \.card,\.commitments \.card\{transition:none\}/);
-  assert.match(about, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
-  assert.doesNotMatch(about, /\.values \.card\{[^}]*width:\s*\d+px/);
+  assert.match(about, /\.trust-grid\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+  assert.match(about, /@media\(max-width:760px\)\{[^}]*\.trust-grid\{grid-template-columns:1fr\}/);
+  assert.match(about, /\.card\{padding:20px;[^}]*background:#fff/);
+  assert.match(about, /\.card p\{margin:0;color:var\(--muted\)\}/);
 });
 
 
