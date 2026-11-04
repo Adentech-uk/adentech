@@ -20,8 +20,11 @@
     a{color:inherit}
     .site{max-width:1080px;margin:0 auto;min-height:100vh;background:#f7faff;box-shadow:0 18px 65px rgba(17,43,78,.12)}
     header{padding:14px clamp(18px,5vw,56px);display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fff;border-bottom:1px solid var(--line)}
-    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:800;font-size:26px;color:#10284a}
-    .brand img{width:62px;height:62px;object-fit:contain}
+    .brand{display:inline-flex;align-items:center;gap:15px;text-decoration:none;flex:0 0 auto;min-width:0}
+    .brand img{display:block;width:82px;height:82px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 4px 7px rgba(12,39,76,.18))}
+    .brand-copy{display:flex;flex-direction:column;line-height:1.08}
+    .brand-name{font-size:clamp(23px,3vw,31px);font-weight:800;letter-spacing:-.8px;color:#10284a}
+    .brand-tagline{margin-top:6px;font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:#3970aa}
     nav{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
     nav a{font-weight:700;text-decoration:none;color:#17345c;padding:9px 12px;border-radius:999px}
     nav a:last-child{background:#1769e0;color:white}
@@ -51,8 +54,8 @@
     footer a{color:#1769e0}
     .skip{position:absolute;left:-9999px;top:10px;background:white;padding:10px;z-index:5}
     .skip:focus{left:10px}
-    @media(max-width:760px){header{align-items:flex-start}.grid,.faq{grid-template-columns:1fr}nav{gap:4px}nav a{padding:8px;font-size:14px}.brand img{width:52px;height:52px}.brand{font-size:23px}}
-    @media(max-width:380px){header{padding:10px 12px;gap:6px}.brand{font-size:20px;gap:7px}.brand img{width:44px;height:44px}nav a{font-size:12px;padding:7px 8px}main{padding:14px}.hero{padding:25px 19px}}
+    @media(max-width:760px){header{align-items:flex-start}.grid,.faq{grid-template-columns:1fr}nav{gap:4px}nav a{padding:8px;font-size:14px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}}
+    @media(max-width:380px){header{padding:10px 12px;gap:6px}.brand{gap:8px}.brand img{width:56px;height:56px}.brand-name{font-size:23px}.brand-tagline{font-size:8px;letter-spacing:1px}nav a{font-size:12px;padding:7px 8px}main{padding:14px}.hero{padding:25px 19px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
 </head>
@@ -60,7 +63,7 @@
 <a class="skip" href="#main">Skip to main content</a>
 <div class="site">
   <header>
-    <a class="brand" href="index.html" aria-label="AdenTech home"><img src="/assets/adentech-logo.svg" alt="">AdenTech</a>
+    <a class="brand" href="index.html" aria-label="AdenTech home"><img src="/assets/adentech-logo.svg" alt=""><span class="brand-copy"><span class="brand-name">AdenTech</span><span class="brand-tagline">IT Support &amp; Setup</span></span></a>
     <nav aria-label="Main navigation"><a href="index.html">Home</a><a href="about.html">About</a><a href="index.html#start">Get a quote</a></nav>
   </header>
   <main id="main">
@@ -74,7 +77,7 @@
     </section>
     <section aria-labelledby="included-title">
       <h2 id="included-title">Straightforward pricing</h2>
-      <p class="intro">The introductory £20-per-hour offer is available to my first 10 customers only. I’ll discuss any parts or additional work with you before proceeding. The price is for labour; I’ll discuss any parts or additional work with you before proceeding.</p>
+      <p class="intro">The introductory £20-per-hour offer is available to my first 10 customers only. The price is for labour; I’ll discuss any parts or additional work with you before proceeding.</p>
       <div class="grid">
         <article class="card price-card"><h3>Labour</h3><p><strong>£20 per hour</strong>, with a one-hour minimum. If more time or a different scope is needed, I’ll explain and agree it with you first.</p></article>
         <article class="card price-card"><h3>Local travel</h3><p>Travel within approximately 5 miles of NW8 is included. If you are outside that area, I’ll confirm any additional travel arrangements before accepting the job.</p></article>
