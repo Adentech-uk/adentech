@@ -107,7 +107,8 @@ test("customer receipt status reflects provider acceptance without claiming deli
 
 test("About page includes the founder portrait, LinkedIn and Google review link", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.ok(about.includes('src="/assets/founder.png"'));
+  assert.ok(about.includes('src="assets/founder.png"'));
+  assert.ok(fs.existsSync(__dirname + "/../assets/founder.png"));
   assert.ok(about.includes("https://www.linkedin.com/in/mahad-aden-0327a1124"));
   assert.ok(about.includes("https://g.page/r/CS4FWxybnOanEBM/review"));
 });
