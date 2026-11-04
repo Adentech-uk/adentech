@@ -231,10 +231,10 @@
             <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="20" placeholder="e.g. 1 laptop, 2 monitors and 1 printer"><span class="form-help">Include computers, monitors, printers and other equipment.</span></div>
             <div class="field"><label for="timing">Preferred timing</label><select id="timing" name="timing"><option value="">Choose a day</option><option>Saturday</option><option>Sunday</option></select></div>
             <div class="field full"><label id="subject-label" for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
-            <div class="field full"><label for="details">How can we help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
+            <div class="field full"><label for="details">How can I help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
             <div class="hp" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
           </div>
-          <p class="form-help">For quote requests, I’ll review the information and contact you if I need clarification. Submitting this form is not a confirmed quote or booking. Your postcode helps me check whether I can cover your area. Please don't enter your full address or phone number at this stage. If you decide to go ahead with a quote, I may ask for these details later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond. See our <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
+          <p class="form-help">For quote requests, I’ll review the information and contact you if I need clarification. Submitting this form is not a confirmed quote or booking. Your postcode helps me check whether I can cover your area. Please don't enter your full address or phone number at this stage. If you decide to go ahead with a quote, I may ask for these details later to arrange the work. Never include passwords or sensitive account information. By submitting, you ask AdenTech to use these details to respond. See my <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.</p>
           <button class="button" id="submit-button" type="submit">Send my enquiry</button>
           <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
         </form>
@@ -358,7 +358,7 @@
       });
       const result = await response.json().catch(function(){ return null; });
       if (!response.ok || !result || result.ok !== true || !/^AT-[A-F0-9]{10}$/.test(result.reference || "")) {
-        throw new Error(result && result.error ? result.error : "We could not confirm delivery to AdenTech.");
+        throw new Error(result && result.error ? result.error : "I couldn’t confirm delivery to AdenTech.");
       }
       submitted = true;
       form.reset();
@@ -366,16 +366,16 @@
       requestId = createRequestId();
       submitted = false;
       if (result.customerReceiptSent === true) {
-        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Resend has accepted a receipt email for sending to " + escapeHtml(payload.email) + ".</p><p>We'll review your request and get back to you if we need any more information.</p><p><small>Reference: " + escapeHtml(result.reference) + " · This is not a confirmed quote or booking. If you can't see our email, please check your junk folder.</small></p>";
+        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Resend has accepted a receipt email for sending to " + escapeHtml(payload.email) + ".</p><p>I’ll review your request and get back to you if we need any more information.</p><p><small>Reference: " + escapeHtml(result.reference) + " · This is not a confirmed quote or booking. If you can't see our email, please check your junk folder.</small></p>";
         status.className = "form-status visible success";
       } else {
-        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Your request has reached us, but we couldn't confirm that a separate receipt email was accepted for sending. Your reference is " + escapeHtml(result.reference) + ".</p><p><small>We'll review your request. This is not a confirmed quote or booking.</small></p>";
+        status.innerHTML = "<strong>✓ Request received</strong><p>Thank you for contacting AdenTech. Your request has reached us, but I couldn’t confirm that a separate receipt email was accepted for sending. Your reference is " + escapeHtml(result.reference) + ".</p><p><small>I’ll review your request. This is not a confirmed quote or booking.</small></p>";
         status.className = "form-status visible";
       }
       button.disabled = false;
       button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     } catch (error) {
-      setStatus((error && error.message ? error.message : "We could not confirm delivery.") + " Your details are still on this page. Please try again or email support@adentech.co.uk.", true);
+      setStatus((error && error.message ? error.message : "I couldn’t confirm delivery.") + " Your details are still on this page. Please try again or email support@adentech.co.uk.", true);
       button.disabled = false;
       button.textContent = kind.value === "quote" ? "Request my quote" : "Send my enquiry";
     }
