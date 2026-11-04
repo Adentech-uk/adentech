@@ -23,6 +23,12 @@ test("both pages provide keyboard skip navigation and visible focus styling", ()
   assert.ok(about.includes(':focus-visible'));
 });
 
+test("About page responsive CSS keeps media queries on valid separate lines", () => {
+  const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
+  assert.ok(about.includes("}\n    @media(max-width:700px)"));
+  assert.ok(!about.includes("\\n    @media(max-width:700px)"));
+});
+
 test("website explains local coverage and quote expectations", () => {
   assert.match(html, /Based in NW8 and serving nearby areas/i);
   assert.match(html, /confirm whether your location is covered/i);
