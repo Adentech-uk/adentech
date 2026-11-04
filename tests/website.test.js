@@ -160,6 +160,7 @@ test("About values and commitments use fluid, readable cards at phone, tablet an
 test("dedicated pricing page explains the introductory rate and local travel consistently", () => {
   const pricing = fs.readFileSync(__dirname + "/../pricing.html", "utf8");
   assert.match(pricing, /£20 per hour/);
+  assert.match(pricing, /first 10 customers only/i);
   assert.match(pricing, /one-hour minimum/);
   assert.match(pricing, /approximately 5 miles of NW8/);
   assert.match(pricing, /not VAT registered/i);
