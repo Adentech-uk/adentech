@@ -145,7 +145,7 @@ test("founder story stacks on narrow screens with a readable portrait and text c
   assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.founder\{[^}]*grid-template-columns:1fr/);
   assert.match(about, /\.portrait\{[^}]*width:150px;height:150px;max-width:100%;aspect-ratio:1\/1/);
   assert.match(about, /border-radius:50%/);
-  assert.match(about, /width:min\(100%,140px\);height:140px;max-width:140px/;
+  assert.match(about, /width:min\(100%,140px\);height:140px;max-width:140px/);
   assert.match(about, /\.story p\{margin:0 0 12px;color:var\(--muted\)\}/);
 });
 
