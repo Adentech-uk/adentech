@@ -141,8 +141,8 @@ test("About page has mobile viewport, touch-friendly navigation and narrow-scree
 
 test("founder story stacks on narrow screens with a readable portrait and text column", () => {
   const about = fs.readFileSync(__dirname + "/../about.html", "utf8");
-  assert.match(about, /\.founder\{[^}]*grid-template-columns:190px minmax\(0,1fr\)/);
-  assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.founder\{grid-template-columns:1fr\}/);
+  assert.match(about, /\.founder\{[^}]*grid-template-columns:minmax\(190px,230px\)/);
+  assert.match(about, /@media\(max-width:760px\)[\s\S]*?\.founder\{[^}]*grid-template-columns:1fr/);
   assert.match(about, /\.portrait\{[^}]*max-width:190px/);
   assert.match(about, /\.story p\{margin:0 0 12px;color:var\(--muted\)\}/);
 });
