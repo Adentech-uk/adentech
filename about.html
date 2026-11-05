@@ -32,8 +32,8 @@
     section{margin-top:30px}
     h2{font-size:clamp(25px,3.4vw,34px);line-height:1.2;margin:0 0 12px}
     .intro{max-width:720px;color:var(--muted);margin:0 0 22px}
-    .founder{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:center;padding:22px;border:1px solid var(--line);border-radius:15px;background:#fff}
-    .portrait{display:block;width:100%;max-width:190px;aspect-ratio:1;object-fit:cover;border-radius:14px}
+    .founder{display:grid;grid-template-columns:minmax(190px,230px) minmax(0,1fr);gap:clamp(22px,4vw,36px);align-items:center;padding:clamp(20px,3.5vw,30px);border:1px solid var(--line);border-radius:18px;background:linear-gradient(135deg,#fff 0%,#f8fbff 100%);box-shadow:0 12px 32px rgba(19,52,91,.07)}
+    .portrait{display:block;width:100%;max-width:230px;aspect-ratio:4/5;object-fit:cover;object-position:center 24%;border:5px solid #fff;border-radius:18px;box-shadow:0 10px 26px rgba(12,39,76,.16),0 0 0 1px #dbe5f2}
     .story p{margin:0 0 12px;color:var(--muted)}
     .story p:last-child{margin-bottom:0}
     .story a{color:var(--blue);font-weight:700;text-underline-offset:3px}
@@ -48,7 +48,7 @@
     footer a{color:var(--blue)}
     .skip{position:absolute;left:-9999px;top:10px;background:#fff;padding:10px;z-index:5}
     .skip:focus{left:10px}
-    @media(max-width:760px){header{align-items:center}.founder{grid-template-columns:1fr}.portrait{max-width:150px}.trust-grid{grid-template-columns:1fr}nav{gap:4px}nav a{padding:8px;font-size:14px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}}
+    @media(max-width:760px){header{align-items:center}.founder{grid-template-columns:1fr;justify-items:center;gap:22px}.portrait{width:min(100%,190px);max-width:190px;aspect-ratio:4/5;object-position:center 22%}.story{width:100%}.trust-grid{grid-template-columns:1fr}nav{gap:4px}nav a{padding:8px;font-size:14px}.brand{gap:10px}.brand img{width:68px;height:68px}.brand-tagline{font-size:9px;letter-spacing:1.2px}}
     @media(max-width:380px){header{padding:10px 12px;gap:6px}.brand{gap:8px}.brand img{width:56px;height:56px}.brand-name{font-size:23px}.brand-tagline{font-size:8px;letter-spacing:1px}nav a{font-size:12px;padding:7px 8px}main{padding:14px}.hero{padding:25px 19px}}
     @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
   </style>
