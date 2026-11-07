@@ -41,7 +41,9 @@ test("quote form requires postcode, equipment, quantity, job type, subject and a
   assert.match(script, /equipment\.required\s*=\s*isQuote/);
   assert.match(script, /equipment\.minLength\s*=\s*isQuote\s*\?\s*3\s*:/);
   assert.match(script, /jobType\.required\s*=\s*isQuote/);
+  assert.match(script, /jobTypeLabel\.textContent\s*=\s*isQuote/);
   assert.match(script, /deviceQuantity\.required\s*=\s*isQuote/);
+  assert.match(script, /deviceQuantityLabel\.textContent\s*=\s*isQuote/);
   assert.match(html, /id="deviceQuantity" name="deviceQuantity" maxlength="100"/);
   assert.match(script, /details\.minLength\s*=\s*isQuote\s*\?\s*20/);
   assert.match(script, /subject\.required\s*=\s*true/);
