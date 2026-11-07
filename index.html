@@ -200,6 +200,7 @@
   </footer>
 </div>
 <script src="config.js"></script>
+<script src="auth-config.js"></script>
 <script>
 (function(){
   "use strict";
@@ -311,10 +312,20 @@
     button.textContent = "Sending…";
     setStatus("Sending your request…", false);
     try {
+      const requestHeaders = {"Content-Type":"application/json"};
+      const authConfig = window.ADENTECH_AUTH_CONFIG || {};
+      if (authConfig.supabaseUrl && !authConfig.supabaseUrl.includes("YOUR-PROJECT") &&
+          authConfig.supabaseAnonKey && !authConfig.supabaseAnonKey.includes("YOUR_")) {
+        const authModule = await import("https://esm.sh/@supabase/supabase-js@2");
+        const authClient = authModule.createClient(authConfig.supabaseUrl, authConfig.supabaseAnonKey);
+        const sessionResult = await authClient.auth.getSession();
+        const accessToken = sessionResult.data && sessionResult.data.session && sessionResult.data.session.access_token;
+        if (accessToken) requestHeaders.Authorization = "Bearer " + accessToken;
+      }
       const response = await fetch(endpoint, {
         method: "POST",
         mode: "cors",
-        headers: {"Content-Type":"application/json"},
+        headers: requestHeaders,
         body: JSON.stringify(payload),
         cache: "no-store"
       });
