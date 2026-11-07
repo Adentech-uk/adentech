@@ -184,3 +184,28 @@ test("responsive browser check targets the current About trust cards and real br
   assert.match(responsive, /card\.textWidth > 0 && card\.textHeight > 0/);
   assert.doesNotMatch(responsive, /\.values \.grid|\.commitments/);
 });
+
+
+test("customer account pages exist and never expose a service-role secret", () => {
+  const login = fs.readFileSync(__dirname + "/../login.html", "utf8");
+  const account = fs.readFileSync(__dirname + "/../account.html", "utf8");
+  const reset = fs.readFileSync(__dirname + "/../reset-password.html", "utf8");
+  const admin = fs.readFileSync(__dirname + "/../admin.html", "utf8");
+  const authConfig = fs.readFileSync(__dirname + "/../auth-config.js", "utf8");
+  const authScript = fs.readFileSync(__dirname + "/../assets/account-auth.js", "utf8");
+  const customerScript = fs.readFileSync(__dirname + "/../assets/customer-account.js", "utf8");
+  const adminScript = fs.readFileSync(__dirname + "/../assets/admin-dashboard.js", "utf8");
+  assert.match(html, /href="login\.html">Account/);
+  assert.match(login, /Create account/);
+  assert.match(login, /Forgot password/);
+  assert.match(account, /Your requests/);
+  assert.match(reset, /Save new password/);
+  assert.match(admin, /Owner dashboard/);
+  assert.match(adminScript, /currentLevel!=="aal2"/);
+  assert.match(adminScript, /app_metadata\?\.role!=="admin"/);
+  assert.match(adminScript, /mfa\.verify/);
+  assert.match(customerScript, /from\("service_requests"\)/);
+  assert.match(authScript, /signUp/);
+  assert.match(authScript, /resetPasswordForEmail/);
+  assert.doesNotMatch(authConfig, /service.role|service_role|SUPABASE_SERVICE_ROLE_KEY/i);
+});
