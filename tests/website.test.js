@@ -100,6 +100,8 @@ test("privacy policy discloses GitHub, Cloudflare, Resend and Gmail processing",
   assert.match(privacy, /Resend/);
   assert.match(privacy, /Gmail/);
   assert.match(privacy, /No Google Apps Script or Google Sheets service is used/i);
+  assert.match(privacy, /Supabase/);
+  assert.match(privacy, /multi-factor authentication/i);
   assert.match(privacy, /does not ask for a phone number or full service address at the initial enquiry stage/i);
 });
 
