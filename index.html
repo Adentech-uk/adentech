@@ -173,9 +173,9 @@
             <div class="field"><label for="name">Full name *</label><input id="name" name="name" autocomplete="name" maxlength="160" required></div>
             <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
             <div class="field"><label id="location-label" for="location">Postcode</label><input id="location" name="location" maxlength="20" autocomplete="postal-code" placeholder="Postcode only"></div>
-            <div class="field"><label for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose</option><option>Free IT advice</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
+            <div class="field"><label id="jobType-label" for="jobType">Type of help</label><select id="jobType" name="jobType"><option value="">Please choose</option><option>Free IT advice</option><option>Computer or laptop setup</option><option>Microsoft 365, email or account help</option><option>Wi-Fi or network issue</option><option>Monitor, printer or workstation setup</option><option>Technical troubleshooting</option><option>Other / not sure</option></select></div>
             <div class="field"><label id="equipment-label" for="equipment">Equipment / make and model</label><input id="equipment" name="equipment" maxlength="500" placeholder="e.g. laptop, two monitors, printer"></div>
-            <div class="field"><label for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="100" placeholder="e.g. 1 laptop, 2 monitors and 1 printer"><span class="form-help">Include computers, monitors, printers and other equipment.</span></div>
+            <div class="field"><label id="deviceQuantity-label" for="deviceQuantity">Number of devices</label><input id="deviceQuantity" name="deviceQuantity" maxlength="100" placeholder="e.g. 1 laptop, 2 monitors and 1 printer"><span class="form-help">Include computers, monitors, printers and other equipment.</span></div>
             <div class="field"><label for="timing">Preferred timing</label><select id="timing" name="timing"><option value="">Choose a day</option><option>Saturday</option><option>Sunday</option></select></div>
             <div class="field full"><label id="subject-label" for="subject">Subject *</label><input id="subject" name="subject" maxlength="250" required placeholder="Briefly describe what you need"></div>
             <div class="field full"><label for="details">How can I help? *</label><textarea id="details" name="details" maxlength="5000" required minlength="10" placeholder="Describe the setup or problem. For quote requests, include useful details about the work needed (at least 20 characters)."></textarea></div>
@@ -214,7 +214,9 @@
   const equipment = document.getElementById("equipment");
   const equipmentLabel = document.getElementById("equipment-label");
   const jobType = document.getElementById("jobType");
+  const jobTypeLabel = document.getElementById("jobType-label");
   const deviceQuantity = document.getElementById("deviceQuantity");
+  const deviceQuantityLabel = document.getElementById("deviceQuantity-label");
   const button = document.getElementById("submit-button");
   const status = document.getElementById("form-status");
   function setStatus(message, isError){
@@ -256,8 +258,10 @@
     equipment.minLength = isQuote ? 3 : 0;
     equipmentLabel.textContent = isQuote ? "Equipment / make and model *" : "Equipment / make and model";
     jobType.required = isQuote;
+    jobTypeLabel.textContent = isQuote ? "Type of help *" : "Type of help";
     jobType.options[0].textContent = isQuote ? "Please choose a type of help" : "Please choose (optional)";
     deviceQuantity.required = isQuote;
+    deviceQuantityLabel.textContent = isQuote ? "Number of devices *" : "Number of devices";
     deviceQuantity.placeholder = isQuote ? "e.g. 1 laptop, 2 monitors and 1 printer" : "e.g. 1 laptop, 2 monitors and 1 printer (optional)";
     details.minLength = isQuote ? 20 : 10;
     details.placeholder = isQuote
