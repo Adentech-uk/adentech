@@ -36,10 +36,15 @@ test("website has no duplicate element IDs", () => {
   assert.equal(ids.length, new Set(ids).size);
 });
 
-test("quote form requires postcode, equipment, subject and a useful job description", () => {
+test("quote form requires postcode, equipment, quantity, job type, subject and a useful job description", () => {
   assert.match(script, /location\.required\s*=\s*isQuote/);
   assert.match(script, /equipment\.required\s*=\s*isQuote/);
   assert.match(script, /equipment\.minLength\s*=\s*isQuote\s*\?\s*3\s*:/);
+  assert.match(script, /jobType\.required\s*=\s*isQuote/);
+  assert.match(script, /jobTypeLabel\.textContent\s*=\s*isQuote/);
+  assert.match(script, /deviceQuantity\.required\s*=\s*isQuote/);
+  assert.match(script, /deviceQuantityLabel\.textContent\s*=\s*isQuote/);
+  assert.match(html, /id="deviceQuantity" name="deviceQuantity" maxlength="100"/);
   assert.match(script, /details\.minLength\s*=\s*isQuote\s*\?\s*20/);
   assert.match(script, /subject\.required\s*=\s*true/);
 });
@@ -73,17 +78,17 @@ test("submission retry keeps the request ID until the customer edits the form", 
   assert.match(script, /form\.addEventListener\("input"/);
 });
 
-test("homepage keeps pricing on its own page and retains the quote journey", () => {
+test("homepage removes public pricing navigation and retains a clear quote journey", () => {
   const pricing = fs.readFileSync(__dirname + "/../pricing.html", "utf8");
-  assert.ok(html.includes('href="pricing.html">Pricing</a>'));
+  assert.doesNotMatch(html, /href="pricing\.html"/);
+  assert.match(html, /class="header-link" href="#start">Get a quote/);
   assert.ok(html.includes('href="#start">Get a quote</a>'));
   assert.ok(html.includes('id="start"'));
   assert.ok(html.includes('id="enquiry-form"'));
   assert.doesNotMatch(html, /£20 per hour|one-hour minimum|£50 minimum visit charge/);
-  assert.match(pricing, /£20 per hour/);
-  assert.match(pricing, /one-hour minimum/);
-  assert.match(pricing, /approximately 5 miles of NW8 is included/);
-  assert.doesNotMatch(pricing, /£50 minimum visit charge|Travel is included in the quote/);
+  assert.match(pricing, /http-equiv="refresh" content="0; url=index\.html#start"/);
+  assert.match(pricing, /Continue to the AdenTech quote form/);
+  assert.doesNotMatch(pricing, /£20|£50|£0\.45|per hour|first 10 customers|5 miles of NW8/i);
   assert.ok(html.includes("<option>Saturday</option>"));
   assert.ok(html.includes("<option>Sunday</option>"));
   assert.ok(html.includes("https://www.facebook.com/profile.php?id=61596044257571"));
@@ -159,15 +164,11 @@ test("About trust cards remain readable and responsive across screen sizes", () 
 });
 
 
-test("dedicated pricing page explains the introductory rate and local travel consistently", () => {
+test("legacy pricing URL no longer publishes a price list and redirects to the quote form", () => {
   const pricing = fs.readFileSync(__dirname + "/../pricing.html", "utf8");
-  assert.match(pricing, /£20 per hour/);
-  assert.match(pricing, /first 10 customers only/i);
-  assert.match(pricing, /one-hour minimum/);
-  assert.match(pricing, /approximately 5 miles of NW8/);
-  assert.match(pricing, /not VAT registered/i);
+  assert.match(pricing, /meta name="robots" content="noindex,follow"/);
   assert.match(pricing, /index\.html#start/);
-  assert.doesNotMatch(pricing, /£50 minimum visit|£0\.45 per mile|VAT will be added/i);
+  assert.doesNotMatch(pricing, /£20|£50|£0\.45|per hour|first 10 customers|5 miles of NW8/i);
 });
 
 test("responsive browser check targets the current About trust cards and real breakpoints", () => {
