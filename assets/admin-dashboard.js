@@ -19,7 +19,7 @@ else{
     if(!verified){
      const {data:enrol,error:enrolError}=await supabase.auth.mfa.enroll({factorType:"totp",friendlyName:"AdenTech admin authenticator"});
      if(enrolError){message.textContent=enrolError.message;}
-     else{mfa.hidden=false;document.querySelector("#qr").innerHTML=enrol.totp.qr_code;window.factorId=enrol.id;message.textContent="Scan the QR code with an authenticator app, then enter its six-digit code.";}
+     else{mfa.hidden=false;const qr=document.createElement("img");qr.alt="Authenticator app setup QR code";qr.src=enrol.totp.qr_code;qr.width=220;qr.height=220;document.querySelector("#qr").replaceChildren(qr);const manual=document.createElement("p");manual.textContent="Manual setup key: "+enrol.totp.secret;document.querySelector("#qr").append(manual);window.factorId=enrol.id;message.textContent="Scan the QR code with an authenticator app, then enter its six-digit code.";}
     }else{
      const {data:challenge,error:challengeError}=await supabase.auth.mfa.challenge({factorId:verified.id});
      if(challengeError){message.textContent=challengeError.message;}
