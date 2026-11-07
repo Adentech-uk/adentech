@@ -36,7 +36,7 @@ test("website has no duplicate element IDs", () => {
   assert.equal(ids.length, new Set(ids).size);
 });
 
-test("quote form requires postcode, equipment, subject and a useful job description", () => {
+test("quote form requires postcode, equipment, quantity, job type, subject and a useful job description", () => {
   assert.match(script, /location\.required\s*=\s*isQuote/);
   assert.match(script, /equipment\.required\s*=\s*isQuote/);
   assert.match(script, /equipment\.minLength\s*=\s*isQuote\s*\?\s*3\s*:/);
